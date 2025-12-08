@@ -1,0 +1,34 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}CaseWork{% endblock %}
+
+{% block body %}
+    <h1>CaseWork</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ case_work.id }}</td>
+            </tr>
+            <tr>
+                <th>Tittel</th>
+                <td>{{ case_work.tittel }}</td>
+            </tr>
+            <tr>
+                <th>Statu</th>
+                <td>{{ case_work.statu }}</td>
+            </tr>
+            <tr>
+                <th>Discription</th>
+                <td>{{ case_work.discription }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_case_work_index') }}">back to list</a>
+
+    <a href="{{ path('app_case_work_edit', {'id': case_work.id}) }}">edit</a>
+
+    {{ include('case_work/_delete_form.html.twig') }}
+{% endblock %}

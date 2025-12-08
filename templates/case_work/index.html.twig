@@ -1,0 +1,39 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}CaseWork index{% endblock %}
+
+{% block body %}
+    <h1>CaseWork index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Tittel</th>
+                <th>Statu</th>
+                <th>Discription</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for case_work in case_works %}
+            <tr>
+                <td>{{ case_work.id }}</td>
+                <td>{{ case_work.tittel }}</td>
+                <td>{{ case_work.statu }}</td>
+                <td>{{ case_work.discription }}</td>
+                <td>
+                    <a href="{{ path('app_case_work_show', {'id': case_work.id}) }}">show</a>
+                    <a href="{{ path('app_case_work_edit', {'id': case_work.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="5">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_case_work_new') }}">Create new</a>
+{% endblock %}

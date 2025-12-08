@@ -1,0 +1,43 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}ChainOfCoady index{% endblock %}
+
+{% block body %}
+    <h1>ChainOfCoady index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Action</th>
+                <th>Description</th>
+                <th>Date_update</th>
+                <th>NewHash</th>
+                <th>PreviosHash</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for chain_of_coady in chain_of_coadies %}
+            <tr>
+                <td>{{ chain_of_coady.id }}</td>
+                <td>{{ chain_of_coady.action }}</td>
+                <td>{{ chain_of_coady.description }}</td>
+                <td>{{ chain_of_coady.dateUpdate ? chain_of_coady.dateUpdate|date('Y-m-d') : '' }}</td>
+                <td>{{ chain_of_coady.newHash }}</td>
+                <td>{{ chain_of_coady.PreviosHash }}</td>
+                <td>
+                    <a href="{{ path('app_chain_of_coady_show', {'id': chain_of_coady.id}) }}">show</a>
+                    <a href="{{ path('app_chain_of_coady_edit', {'id': chain_of_coady.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="7">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_chain_of_coady_new') }}">Create new</a>
+{% endblock %}

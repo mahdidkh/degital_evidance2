@@ -1,0 +1,13 @@
+scheb_two_factor:
+  security_tokens:
+    - Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken
+  email:
+    enabled: true
+    sender_email: 'noreply@digital-evidence.tn'
+
+    digits: 6
+    template: 'security/2fa_email.html.twig'
+  trusted_device:
+    enabled: false
+  backup_codes:
+    enabled: false

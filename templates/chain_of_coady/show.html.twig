@@ -1,0 +1,42 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}ChainOfCoady{% endblock %}
+
+{% block body %}
+    <h1>ChainOfCoady</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ chain_of_coady.id }}</td>
+            </tr>
+            <tr>
+                <th>Action</th>
+                <td>{{ chain_of_coady.action }}</td>
+            </tr>
+            <tr>
+                <th>Description</th>
+                <td>{{ chain_of_coady.description }}</td>
+            </tr>
+            <tr>
+                <th>Date_update</th>
+                <td>{{ chain_of_coady.dateUpdate ? chain_of_coady.dateUpdate|date('Y-m-d') : '' }}</td>
+            </tr>
+            <tr>
+                <th>NewHash</th>
+                <td>{{ chain_of_coady.newHash }}</td>
+            </tr>
+            <tr>
+                <th>PreviosHash</th>
+                <td>{{ chain_of_coady.PreviosHash }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_chain_of_coady_index') }}">back to list</a>
+
+    <a href="{{ path('app_chain_of_coady_edit', {'id': chain_of_coady.id}) }}">edit</a>
+
+    {{ include('chain_of_coady/_delete_form.html.twig') }}
+{% endblock %}

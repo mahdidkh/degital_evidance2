@@ -1,0 +1,39 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Evidance index{% endblock %}
+
+{% block body %}
+    <h1>Evidance index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Tittel</th>
+                <th>FileHash</th>
+                <th>Discription</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for evidance in evidances %}
+            <tr>
+                <td>{{ evidance.id }}</td>
+                <td>{{ evidance.tittel }}</td>
+                <td>{{ evidance.fileHash }}</td>
+                <td>{{ evidance.discription }}</td>
+                <td>
+                    <a href="{{ path('app_evidance_show', {'id': evidance.id}) }}">show</a>
+                    <a href="{{ path('app_evidance_edit', {'id': evidance.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="5">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_evidance_new') }}">Create new</a>
+{% endblock %}
