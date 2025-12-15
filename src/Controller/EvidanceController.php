@@ -14,6 +14,10 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 
+
+use App\Entity\CaseWork;
+
+
 #[Route('/evidance')]
 final class EvidanceController extends AbstractController
 {
@@ -29,6 +33,15 @@ final class EvidanceController extends AbstractController
     public function new(Request $request, EntityManagerInterface $entityManager, SluggerInterface $slugger): Response
     {
         $evidance = new Evidance();
+        // verifier si un case_id est passé en paramètre pour lier l'evidence au CaseWork
+        $caseId = $request->query->get('case_id');
+        if ($caseId) {
+            $caseWork = $entityManager->getRepository(CaseWork::class)->find($caseId);
+            if ($caseWork) {
+               $evidance->setCaseWork($caseWork);
+            }
+        }
+
         $form = $this->createForm(EvidanceType::class, $evidance);
         $form->handleRequest($request);
 

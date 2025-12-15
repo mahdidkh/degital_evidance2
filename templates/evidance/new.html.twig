@@ -3,16 +3,14 @@
 {% block title %}Créer une nouvelle Evidance{% endblock %}
 
 {% block body %}
-<h1>Créer une nouvelle Evidance</h1>
+<h1>Nouvelle Evidence pour </h1>
 
-<div class="card p-4 shadow-sm">
-    {{ include('evidance/_form.html.twig', {
-        button_label: 'Enregistrer'
-    }) }}
-</div>
+{{ form_start(form) }}
+    {{ form_widget(form) }}
+    <button class="btn btn-primary mt-2">Ajouter</button>
+{{ form_end(form) }}
 
-<a class="btn btn-secondary mt-3" href="{{ path('app_evidance_index') }}">
-    ⟵ Retour à la liste
+<a class="btn btn-secondary mt-3" href="{{ path('app_case_work_index') }}">
+    ⟵ Retour à la liste des Cases
 </a>
-
 {% endblock %}

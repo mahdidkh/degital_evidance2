@@ -30,6 +30,9 @@ class Evidance
     #[ORM\Column(length: 255)]
     private ?string $discription = null;
 
+    #[ORM\ManyToOne(inversedBy: 'evidances')]
+    private ?CaseWork $caseWork = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -83,6 +86,18 @@ class Evidance
     public function setDiscription(string $discription): static
     {
         $this->discription = $discription;
+
+        return $this;
+    }
+
+    public function getCaseWork(): ?CaseWork
+    {
+        return $this->caseWork;
+    }
+
+    public function setCaseWork(?CaseWork $caseWork): static
+    {
+        $this->caseWork = $caseWork;
 
         return $this;
     }

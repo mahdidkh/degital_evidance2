@@ -6,6 +6,7 @@
     <h1>Create new CaseWork</h1>
 
     {{ include('case_work/_form.html.twig') }}
+     <a href="{{ path('app_evidance_new', {'id': case_work.id}) }}" class="btn btn-success">Ajouter une Evidence</a>
 
-    <a href="{{ path('app_case_work_index') }}">back to list</a>
+    <a href="{{ path('app_case_work_index') }}" class="btn btn-success">back to list</a>
 {% endblock %}

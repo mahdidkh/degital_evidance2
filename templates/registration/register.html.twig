@@ -1,29 +1,127 @@
-{% extends 'base.html.twig' %}
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
-{% block title %}Register{% endblock %}
+    <title>Register – Digital Evidence Vault</title>
 
-{% block body %}
-    {% for flash_error in app.flashes('verify_email_error') %}
-        <div class="alert alert-danger" role="alert">{{ flash_error }}</div>
-    {% endfor %}
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
 
-    <h1>Register</h1>
+    <!-- Tailwind -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#137fec",
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#0d141b",
+                    },
+                    fontFamily: {
+                        display: ["Inter", "sans-serif"],
+                    },
+                },
+            },
+        }
+    </script>
+</head>
 
-    {{ form_errors(registrationForm) }}
+<body class="bg-background-light dark:bg-background-dark font-display antialiased">
 
-    {{ form_start(registrationForm) }}
-        {{ form_row(registrationForm.cin) }}
-        {{ form_row(registrationForm.first_name) }}
-        {{ form_row(registrationForm.last_name) }}
-        {{ form_row(registrationForm.email) }}
-        {{ form_row(registrationForm.tel) }}
-        {{ form_row(registrationForm.role) }}
-        {{ form_row(registrationForm.plainPassword, {
-            label: 'Password'
-        }) }}
-        {{ form_row(registrationForm.agreeTerms) }}
+<div class="flex min-h-screen w-full flex-col md:flex-row overflow-hidden">
 
-        <button type="submit" class="btn">Register</button>
-    {{ form_end(registrationForm) }}
-    <p> do you already have email ?  <a href="{{ path('app_login') }}">login</a> </p>
-{% endblock %}
+    <!-- Left Branding Section -->
+    <div class="relative hidden md:block md:w-1/2 lg:w-3/5">
+        <div class="absolute inset-0 bg-cover bg-center opacity-40 mix-blend-overlay"
+             style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCawqk2e7isZkqvPXJGQ6fHDHhUKFdfuxHcUN4KAtatbR9kc9NxHBI1AC11KWHN-YM4ttSiow8If6Fc30vl-O_xGPhEmh3zfQEcqBLkEwrKIQ0xoZEj0VVTFmvyXIZKwcYjsu6V3dhKDrOuiIdVXQ7Pq59PM221H5s_ZRKdcnScRICXbRAStvz9uTCw5c6rkC4L918hC_1z5pNHpbWuoehFXyy9IQ3qoy4b5WGtTGhJfIK5s1kAGtB3N7sr1oEVhRxch_qkX2AH95zc");'>
+        </div>
+
+        <div class="absolute inset-0 bg-gradient-to-t from-background-dark via-background-dark/80 to-primary/20"></div>
+
+        <div class="relative flex h-full flex-col justify-between p-12 text-white">
+            <div class="flex items-center gap-3">
+                <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/20 backdrop-blur-sm">
+                    <span class="material-symbols-outlined text-primary text-2xl">shield_lock</span>
+                </div>
+                <span class="text-xl font-bold tracking-tight">Digital Evidence Vault</span>
+            </div>
+
+            <div class="max-w-md space-y-4">
+                <h1 class="text-4xl lg:text-5xl font-bold leading-tight">
+                    Create your secure account
+                </h1>
+                <p class="text-lg text-gray-300">
+                    Access the centralized evidence management system, protected by enterprise‑grade encryption and Symfony security protocols.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Form Section -->
+    <div class="flex w-full flex-col justify-center bg-white dark:bg-[#111418] px-6 py-12 md:w-1/2 md:px-12 lg:w-2/5 lg:px-20">
+
+        <!-- Mobile Branding -->
+        <div class="mb-10 flex items-center gap-2 md:hidden">
+            <div class="flex h-8 w-8 items-center justify-center rounded bg-primary/10">
+                <span class="material-symbols-outlined text-primary text-xl">shield_lock</span>
+            </div>
+            <span class="text-lg font-bold text-gray-900 dark:text-white">Digital Evidence Vault</span>
+        </div>
+
+        <div class="w-full max-w-md mx-auto">
+
+            <!-- Title -->
+            <div class="mb-8 space-y-2">
+                <h2 class="text-3xl font-bold tracking-tight text-gray-900 dark:text-white">Register</h2>
+                <p class="text-sm text-gray-500 dark:text-gray-400">
+                    Fill in your information to create a secure account
+                </p>
+            </div>
+
+            <!-- Flash Errors -->
+            {% for flash_error in app.flashes('verify_email_error') %}
+                <div class="mb-4 rounded-lg bg-red-50 dark:bg-red-900/20 p-3 text-red-700 dark:text-red-300 text-sm">
+                    {{ flash_error }}
+                </div>
+            {% endfor %}
+
+            {{ form_errors(registrationForm) }}
+
+            <!-- Symfony Form -->
+            {{ form_start(registrationForm, { attr: { class: 'space-y-4' } }) }}
+
+                {{ form_row(registrationForm.cin) }}
+                {{ form_row(registrationForm.first_name) }}
+                {{ form_row(registrationForm.last_name) }}
+                {{ form_row(registrationForm.email) }}
+                {{ form_row(registrationForm.tel) }}
+                {{ form_row(registrationForm.role) }}
+                {{ form_row(registrationForm.plainPassword, { label: 'Password' }) }}
+                {{ form_row(registrationForm.agreeTerms) }}
+
+                <button type="submit"
+                        class="mt-4 inline-flex h-12 w-full items-center justify-center rounded-lg bg-primary px-8 py-2 text-sm font-medium text-white transition-all hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 dark:focus:ring-offset-[#111418]">
+                    Create Account
+                </button>
+
+            {{ form_end(registrationForm) }}
+
+            <p class="mt-6 text-sm text-gray-600 dark:text-gray-400">
+                Already have an account?
+                <a href="{{ path('app_login') }}" class="text-primary font-medium hover:underline">
+                    Login
+                </a>
+            </p>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

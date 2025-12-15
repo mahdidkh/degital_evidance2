@@ -11,6 +11,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
+
+
 #[Route('/case/work')]
 final class CaseWorkController extends AbstractController
 {
@@ -78,4 +80,8 @@ final class CaseWorkController extends AbstractController
 
         return $this->redirectToRoute('app_case_work_index', [], Response::HTTP_SEE_OTHER);
     }
+
+
+    
+  
 }

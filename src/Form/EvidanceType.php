@@ -8,6 +8,10 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+ 
+// ajout pour le lien avec CaseWork
+use App\Entity\CaseWork;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 
 class EvidanceType extends AbstractType
 {
@@ -22,8 +26,15 @@ class EvidanceType extends AbstractType
                 'label' => 'Fichier (tous types autorisés)',
                 'mapped' => false,
                 'required' => false,
-                // 'constraints' => [ new File([ 'maxSize' => '20M' ]) ]
+                
                  ])
+                 //casework associe a evidence 
+            ->add('caseWork', EntityType::class, [
+                'class' => CaseWork::class, 
+                'choice_label' => 'tittel',
+                'placeholder' => 'Sélectionner un Case Work',
+                'required' => false,
+            ])
         ;
     }
 

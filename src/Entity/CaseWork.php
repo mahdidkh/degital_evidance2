@@ -3,7 +3,11 @@
 namespace App\Entity;
 
 use App\Repository\CaseWorkRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+
+
 
 #[ORM\Entity(repositoryClass: CaseWorkRepository::class)]
 class CaseWork
@@ -25,9 +29,16 @@ class CaseWork
     #[ORM\ManyToMany(targetEntity: Investigateur::class, mappedBy: 'caseWorks')]
     private Collection $investigateurs;
 
+    /**
+     * @var Collection<int, Evidance>
+     */
+    #[ORM\OneToMany(targetEntity: Evidance::class, mappedBy: 'caseWork')]
+    private Collection $evidances;
+
     public function __construct()
     {
         $this->investigateurs = new ArrayCollection();
+        $this->evidances = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -97,6 +108,36 @@ class CaseWork
     {
         if ($this->investigateurs->removeElement($investigateur)) {
             $investigateur->removeCaseWork($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Evidance>
+     */
+    public function getEvidances(): Collection
+    {
+        return $this->evidances;
+    }
+
+    public function addEvidance(Evidance $evidance): static
+    {
+        if (!$this->evidances->contains($evidance)) {
+            $this->evidances->add($evidance);
+            $evidance->setCaseWork($this);
+        }
+
+        return $this;
+    }
+
+    public function removeEvidance(Evidance $evidance): static
+    {
+        if ($this->evidances->removeElement($evidance)) {
+            // set the owning side to null (unless already changed)
+            if ($evidance->getCaseWork() === $this) {
+                $evidance->setCaseWork(null);
+            }
         }
 
         return $this;

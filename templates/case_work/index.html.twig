@@ -25,6 +25,8 @@
                 <td>
                     <a href="{{ path('app_case_work_show', {'id': case_work.id}) }}">show</a>
                     <a href="{{ path('app_case_work_edit', {'id': case_work.id}) }}">edit</a>
+
+                    <a href="{{ path('app_evidance_new', {'case_id': case_work.id}) }}" class="btn btn-primary">Add Evidence</a>
                 </td>
             </tr>
         {% else %}
