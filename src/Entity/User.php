@@ -1,6 +1,8 @@
 <?php
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
@@ -61,6 +63,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface , TwoFac
 
     #[ORM\Column]
     private bool $isVerified = false;
+
+    /**
+     * @var Collection<int, AuditLog>
+     */
+    #[ORM\OneToMany(targetEntity: AuditLog::class, mappedBy: 'user')]
+    private Collection $auditLogs;
+
+    public function __construct()
+    {
+        $this->auditLogs = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -242,4 +255,29 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface , TwoFac
 
         return $this;
     }
+
+    /**
+     * @return Collection<int, AuditLog>
+     */
+    public function getAuditLogs(): Collection
+    {
+        return $this->auditLogs;
+    }
+
+    public function addAuditLog(AuditLog $auditLog): static
+    {
+        if (!$this->auditLogs->contains($auditLog)) {
+            $this->auditLogs->add($auditLog);
+            $auditLog->setUser($this);
+        }
+
+        return $this;
+    }
+    public function removeAuditLog(AuditLog $auditLog): static
+    {
+    // On ne supprime pas un audit log depuis User
+    // Les audits sont immuables (preuve légale)
+        return $this;
+    }
+
 }
