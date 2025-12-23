@@ -1,127 +1,76 @@
-<!DOCTYPE html>
-<html lang="en" class="dark">
-<head>
-    <meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+{% extends 'base.html.twig' %}
 
-    <title>Register – Digital Evidence Vault</title>
+{% block title %}Register - Digital Evidence Vault{% endblock %}
 
-    <!-- Fonts & Icons -->
-    <link rel="preconnect" href="https://fonts.googleapis.com"/>
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet"/>
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-
-    <!-- Tailwind -->
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <script id="tailwind-config">
-        tailwind.config = {
-            darkMode: "class",
-            theme: {
-                extend: {
-                    colors: {
-                        primary: "#137fec",
-                        "background-light": "#f6f7f8",
-                        "background-dark": "#0d141b",
-                    },
-                    fontFamily: {
-                        display: ["Inter", "sans-serif"],
-                    },
-                },
-            },
-        }
-    </script>
-</head>
-
-<body class="bg-background-light dark:bg-background-dark font-display antialiased">
-
-<div class="flex min-h-screen w-full flex-col md:flex-row overflow-hidden">
-
-    <!-- Left Branding Section -->
-    <div class="relative hidden md:block md:w-1/2 lg:w-3/5">
-        <div class="absolute inset-0 bg-cover bg-center opacity-40 mix-blend-overlay"
-             style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCawqk2e7isZkqvPXJGQ6fHDHhUKFdfuxHcUN4KAtatbR9kc9NxHBI1AC11KWHN-YM4ttSiow8If6Fc30vl-O_xGPhEmh3zfQEcqBLkEwrKIQ0xoZEj0VVTFmvyXIZKwcYjsu6V3dhKDrOuiIdVXQ7Pq59PM221H5s_ZRKdcnScRICXbRAStvz9uTCw5c6rkC4L918hC_1z5pNHpbWuoehFXyy9IQ3qoy4b5WGtTGhJfIK5s1kAGtB3N7sr1oEVhRxch_qkX2AH95zc");'>
+{% block body %}
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-header">
+            <h1 class="auth-title">Create Account</h1>
+            <p class="auth-subtitle">Join the Digital Evidence Vault</p>
         </div>
 
-        <div class="absolute inset-0 bg-gradient-to-t from-background-dark via-background-dark/80 to-primary/20"></div>
+        {% for flash_error in app.flashes('verify_email_error') %}
+            <div class="alert-error">
+                {{ flash_error }}
+            </div>
+        {% endfor %}
 
-        <div class="relative flex h-full flex-col justify-between p-12 text-white">
-            <div class="flex items-center gap-3">
-                <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/20 backdrop-blur-sm">
-                    <span class="material-symbols-outlined text-primary text-2xl">shield_lock</span>
+        {{ form_start(registrationForm, { attr: { class: 'auth-form' } }) }}
+            <div class="form-group">
+                {{ form_widget(registrationForm.cin, { attr: { class: 'form-input', placeholder: 'CIN' } }) }}
+                <div class="text-red-500 text-xs">{{ form_errors(registrationForm.cin) }}</div>
+            </div>
+            
+            <div class="flex gap-4">
+                <div class="form-group flex-1">
+                    {{ form_widget(registrationForm.first_name, { attr: { class: 'form-input', placeholder: 'First Name' } }) }}
+                    <div class="text-red-500 text-xs">{{ form_errors(registrationForm.first_name) }}</div>
                 </div>
-                <span class="text-xl font-bold tracking-tight">Digital Evidence Vault</span>
-            </div>
-
-            <div class="max-w-md space-y-4">
-                <h1 class="text-4xl lg:text-5xl font-bold leading-tight">
-                    Create your secure account
-                </h1>
-                <p class="text-lg text-gray-300">
-                    Access the centralized evidence management system, protected by enterprise‑grade encryption and Symfony security protocols.
-                </p>
-            </div>
-        </div>
-    </div>
-
-    <!-- Right Form Section -->
-    <div class="flex w-full flex-col justify-center bg-white dark:bg-[#111418] px-6 py-12 md:w-1/2 md:px-12 lg:w-2/5 lg:px-20">
-
-        <!-- Mobile Branding -->
-        <div class="mb-10 flex items-center gap-2 md:hidden">
-            <div class="flex h-8 w-8 items-center justify-center rounded bg-primary/10">
-                <span class="material-symbols-outlined text-primary text-xl">shield_lock</span>
-            </div>
-            <span class="text-lg font-bold text-gray-900 dark:text-white">Digital Evidence Vault</span>
-        </div>
-
-        <div class="w-full max-w-md mx-auto">
-
-            <!-- Title -->
-            <div class="mb-8 space-y-2">
-                <h2 class="text-3xl font-bold tracking-tight text-gray-900 dark:text-white">Register</h2>
-                <p class="text-sm text-gray-500 dark:text-gray-400">
-                    Fill in your information to create a secure account
-                </p>
-            </div>
-
-            <!-- Flash Errors -->
-            {% for flash_error in app.flashes('verify_email_error') %}
-                <div class="mb-4 rounded-lg bg-red-50 dark:bg-red-900/20 p-3 text-red-700 dark:text-red-300 text-sm">
-                    {{ flash_error }}
+                <div class="form-group flex-1">
+                    {{ form_widget(registrationForm.last_name, { attr: { class: 'form-input', placeholder: 'Last Name' } }) }}
+                    <div class="text-red-500 text-xs">{{ form_errors(registrationForm.last_name) }}</div>
                 </div>
-            {% endfor %}
+            </div>
 
-            {{ form_errors(registrationForm) }}
+            <div class="form-group">
+                {{ form_widget(registrationForm.email, { attr: { class: 'form-input', placeholder: 'Email Address' } }) }}
+                <div class="text-red-500 text-xs">{{ form_errors(registrationForm.email) }}</div>
+            </div>
 
-            <!-- Symfony Form -->
-            {{ form_start(registrationForm, { attr: { class: 'space-y-4' } }) }}
+            <div class="form-group">
+                {{ form_widget(registrationForm.tel, { attr: { class: 'form-input', placeholder: 'Phone Number' } }) }}
+                <div class="text-red-500 text-xs">{{ form_errors(registrationForm.tel) }}</div>
+            </div>
 
-                {{ form_row(registrationForm.cin) }}
-                {{ form_row(registrationForm.first_name) }}
-                {{ form_row(registrationForm.last_name) }}
-                {{ form_row(registrationForm.email) }}
-                {{ form_row(registrationForm.tel) }}
-                {{ form_row(registrationForm.role) }}
-                {{ form_row(registrationForm.plainPassword, { label: 'Password' }) }}
-                {{ form_row(registrationForm.agreeTerms) }}
+            <div class="form-group">
+                {{ form_widget(registrationForm.role, { attr: { class: 'form-input bg-slate-800' } }) }}
+                <div class="text-red-500 text-xs">{{ form_errors(registrationForm.role) }}</div>
+            </div>
 
-                <button type="submit"
-                        class="mt-4 inline-flex h-12 w-full items-center justify-center rounded-lg bg-primary px-8 py-2 text-sm font-medium text-white transition-all hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 dark:focus:ring-offset-[#111418]">
-                    Create Account
-                </button>
+            <div class="form-group">
+                {{ form_widget(registrationForm.plainPassword, { attr: { class: 'form-input', placeholder: 'Password' } }) }}
+                <div class="text-red-500 text-xs">{{ form_errors(registrationForm.plainPassword) }}</div>
+            </div>
 
-            {{ form_end(registrationForm) }}
+            <div class="form-group flex items-center gap-2">
+                {{ form_widget(registrationForm.agreeTerms, { attr: { class: 'rounded border-slate-600 bg-slate-800 text-blue-600 focus:ring-blue-500' } }) }}
+                <label for="{{ registrationForm.agreeTerms.vars.id }}" class="text-sm text-slate-400">
+                    I agree to the terms and conditions
+                </label>
+            </div>
 
-            <p class="mt-6 text-sm text-gray-600 dark:text-gray-400">
-                Already have an account?
-                <a href="{{ path('app_login') }}" class="text-primary font-medium hover:underline">
-                    Login
-                </a>
-            </p>
+            <button type="submit" class="auth-btn">
+                Register
+            </button>
+        {{ form_end(registrationForm) }}
+        
+        <div class="auth-footer">
+            Already have an account?
+            <a href="{{ path('app_login') }}" class="auth-link">
+                Sign in
+            </a>
         </div>
     </div>
 </div>
-
-</body>
-</html>
+{% endblock %}

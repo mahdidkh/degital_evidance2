@@ -3,10 +3,9 @@
 {% block title %}Hello AdminController!{% endblock %}
 
 {% block body %}
-
-
-<div class="example-wrapper">
-  <h1>Hello {{ app.user.email }}</h1>
-   
-</div>
+    {% include 'componant/sidebar.html.twig' %}
+    
+    <main style="margin-left: 280px; padding: 20px; width: calc(100% - 280px);">
+        
+    </main>
 {% endblock %}

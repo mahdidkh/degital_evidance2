@@ -3,34 +3,52 @@
 {% block title %}Log in!{% endblock %}
 
 {% block body %}
-<form method="post" data-turbo="false">
-    {% if error %}
-        <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
-    {% endif %}
-
-    {% for message in app.flashes('success') %}
-        <div class="alert alert-success">
-            {{ message }}
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-header">
+            <h1 class="auth-title">Welcome Back</h1>
+            <p class="auth-subtitle">Sign in to access your dashboard</p>
         </div>
-    {% endfor %}
 
-    {% if app.user %}
-        <div class="mb-3">
-            You are logged in as {{ app.user.userIdentifier }}, <a href="{{ path('app_logout') }}">Logout</a>
+        <form method="post" data-turbo="false" class="auth-form">
+            {% if error %}
+                <div class="alert-error">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+            {% endif %}
+
+            {% for message in app.flashes('success') %}
+                <div class="p-3 mb-4 text-sm text-green-400 bg-green-900/30 border border-green-900 rounded-lg">
+                    {{ message }}
+                </div>
+            {% endfor %}
+
+            {% if app.user %}
+                <div class="mb-3 text-sm text-slate-400 text-center">
+                    You are logged in as <span class="text-white font-medium">{{ app.user.userIdentifier }}</span>, 
+                    <a href="{{ path('app_logout') }}" class="auth-link">Logout</a>
+                </div>
+            {% endif %}
+
+            <div class="form-group">
+                <label for="inputEmail" class="form-label">Email Address</label>
+                <input type="email" value="{{ last_username }}" name="email" id="inputEmail" class="form-input" autocomplete="email" placeholder="Enter your email" required autofocus>
+            </div>
+
+            <div class="form-group">
+                <label for="inputPassword" class="form-label">Password</label>
+                <input type="password" name="password" id="inputPassword" class="form-input" autocomplete="current-password" placeholder="Enter your password" required>
+            </div>
+
+            <input type="hidden" name="_csrf_token" data-controller="csrf-protection" value="{{ csrf_token('authenticate') }}">
+
+            <button class="auth-btn" type="submit">
+                Sign in
+            </button>
+        </form>
+        
+        <div class="auth-footer">
+            Don't have an account? 
+            <a href="{{ path('app_register') }}" class="auth-link">Register here</a>
         </div>
-    {% endif %}
-
-    <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
-    <label for="inputEmail">Email</label>
-    <input type="email" value="{{ last_username }}" name="email" id="inputEmail" class="form-control" autocomplete="email" required autofocus>
-    <label for="inputPassword">Password</label>
-    <input type="password" name="password" id="inputPassword" class="form-control" autocomplete="current-password" required>
-    <input type="hidden" name="_csrf_token" data-controller="csrf-protection" value="{{ csrf_token('authenticate') }}">
-
-    <button class="btn btn-lg btn-primary" type="submit">
-        Sign in
-    </button>
-</form>
-    <p> do you not have account ?  <a href="{{ path('app_register') }}">click hear to register</a> </p>
-
+    </div>
+</div>
 {% endblock %}
