@@ -1,0 +1,179 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Create New Team
+{% endblock %}
+
+{% block stylesheets %}
+	{{ parent() }}
+	<style>:root
+	{
+		--bg-dark: #0f172a;
+		--card-bg: #1e293b;
+		--card-border: #334155;
+		--accent-blue: #3b82f6;
+		--text-primary: #f8fafc;
+		--text-secondary: #94a3b8;
+		--sidebar-width: 280px;
+	}
+
+	body {
+		background-color: var(--bg-dark);
+		color: var(--text-primary);
+		font-family: 'Inter', system-ui, -apple-system, sans-serif;
+		margin: 0;
+	}
+
+	.creator-container {
+		margin-left: var(--sidebar-width);
+		padding: 4rem 2rem;
+		min-height: 100vh;
+		display: flex;
+		justify-content: center;
+		align-items: flex-start;
+	}
+
+	.flash-messages-container {
+		margin-left: var(--sidebar-width);
+	}
+
+	.glass-card {
+		background: rgba(30, 41, 59, 0.7);
+		backdrop-filter: blur(10px);
+		border: 1px solid var(--card-border);
+		border-radius: 16px;
+		width: 100%;
+		max-width: 600px;
+		padding: 3rem;
+	}
+
+	.page-header {
+		margin-bottom: 2.5rem;
+		text-align: center;
+	}
+
+	.page-title {
+		font-size: 2rem;
+		font-weight: 800;
+		letter-spacing: -0.05em;
+		color: #fff;
+		margin-bottom: 0.5rem;
+	}
+
+	.form-label {
+		color: var(--text-secondary);
+		font-weight: 500;
+		margin-bottom: 0.75rem;
+	}
+
+	.form-control {
+		background-color: rgba(15, 23, 42, 0.5);
+		border: 1px solid var(--card-border);
+		color: #fff;
+		padding: 1rem;
+		border-radius: 10px;
+		font-size: 1.125rem;
+		transition: all 0.2s;
+	}
+
+	.form-control:focus {
+		background-color: var(--bg-dark);
+		border-color: var(--accent-blue);
+		box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+		color: #fff;
+	}
+
+	.btn-premium {
+		background: var(--accent-blue);
+		color: white;
+		border: none;
+		padding: 1rem 2rem;
+		border-radius: 12px;
+		font-weight: 700;
+		font-size: 1.125rem;
+		width: 100%;
+		transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+		margin-top: 1rem;
+		cursor: pointer;
+	}
+
+	.btn-premium:hover {
+		background: #2563eb;
+		transform: translateY(-2px);
+		box-shadow: 0 8px 20px rgba(59, 130, 246, 0.3);
+	}
+
+	.btn-back {
+		color: var(--text-secondary);
+		text-decoration: none;
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
+		margin-bottom: 2rem;
+		font-weight: 500;
+		transition: color 0.2s;
+	}
+
+	.btn-back:hover {
+		color: #fff;
+	}
+
+	.pro-tip {
+		background: rgba(59, 130, 246, 0.05);
+		border: 1px solid rgba(59, 130, 246, 0.1);
+		border-radius: 12px;
+		padding: 1.25rem;
+		display: flex;
+		gap: 1rem;
+		color: var(--text-secondary);
+		font-size: 0.9rem;
+		line-height: 1.5;
+		margin-top: 2rem;
+	}
+
+	.pro-tip strong {
+		color: var(--accent-blue);
+	}
+
+	.pro-tip svg {
+		color: var(--accent-blue);
+		flex-shrink: 0;
+	}
+</style>{% endblock %}{% block body %}
+{% include 'componant/sidebar.html.twig' %}
+
+<div class="creator-container">
+	<div class="glass-card">
+		<a href="{{ path('app_supervisor_index') }}" class="btn-back">
+			<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewbox="0 0 24 24" stroke="currentColor">
+				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+			</svg>
+			Back to Dashboard
+		</a>
+
+		<div class="page-header">
+			<h1 class="page-title">Create a New Team</h1>
+			<p class="text-secondary">Define your investigative units and manage your assets.</p>
+		</div>
+
+		<form action="{{ path('app_supervisor_team_new') }}" method="POST">
+			<div class="mb-5">
+				<label for="teamName" class="form-label">Team Designation</label>
+				<input type="text" class="form-control" id="teamName" name="name" placeholder="e.g. Forensics Unit Beta" required autofocus>
+			</div>
+
+			<div class="pro-tip mb-4">
+				<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewbox="0 0 24 24" stroke="currentColor">
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+				</svg>
+				<div>
+					<strong>Pro Tip:</strong>
+					Use a clear name. You'll be able to assign investigators right after synchronization.
+				</div>
+			</div>
+
+			<button type="submit" class="btn-premium">
+				Initialize Team
+			</button>
+		</form>
+	</div>
+</div>{% endblock %}

@@ -22,6 +22,7 @@ class Investigateur extends User
     public function __construct()
     {
         $this->caseWorks = new ArrayCollection();
+        $this->teams = new ArrayCollection();
     }
 
     public function getEmployerId(): ?string
@@ -65,6 +66,50 @@ class Investigateur extends User
         if ($this->caseWorks->removeElement($caseWork)) {
             $caseWork->removeInvestigateur($this);
         }
+        return $this;
+    }
+    #[ORM\ManyToOne(inversedBy: 'investigateurs')]
+    private ?Supervisor $supervisor = null;
+
+    public function getSupervisor(): ?Supervisor
+    {
+        return $this->supervisor;
+    }
+
+    public function setSupervisor(?Supervisor $supervisor): static
+    {
+        $this->supervisor = $supervisor;
+
+        return $this;
+    }
+
+    #[ORM\ManyToMany(targetEntity: Team::class, mappedBy: 'investigateurs')]
+    private Collection $teams;
+
+    /**
+     * @return Collection<int, Team>
+     */
+    public function getTeams(): Collection
+    {
+        return $this->teams;
+    }
+
+    public function addTeam(Team $team): static
+    {
+        if (!$this->teams->contains($team)) {
+            $this->teams->add($team);
+            $team->addInvestigateur($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTeam(Team $team): static
+    {
+        if ($this->teams->removeElement($team)) {
+            $team->removeInvestigateur($this);
+        }
+
         return $this;
     }
 }

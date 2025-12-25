@@ -35,10 +35,27 @@ class CaseWork
     #[ORM\OneToMany(targetEntity: Evidance::class, mappedBy: 'caseWork')]
     private Collection $evidances;
 
+    #[ORM\ManyToOne(inversedBy: 'caseWorks')]
+    private ?Team $assignedTeam = null;
+
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Supervisor $createdBy = null;
+
+    #[ORM\Column(length: 50)]
+    private ?string $priority = 'medium';
+
+    #[ORM\Column]
+    private ?\DateTimeImmutable $createdAt = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $updatedAt = null;
+
     public function __construct()
     {
         $this->investigateurs = new ArrayCollection();
         $this->evidances = new ArrayCollection();
+        $this->createdAt = new \DateTimeImmutable();
     }
 
     public function getId(): ?int
@@ -139,6 +156,66 @@ class CaseWork
                 $evidance->setCaseWork(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getAssignedTeam(): ?Team
+    {
+        return $this->assignedTeam;
+    }
+
+    public function setAssignedTeam(?Team $assignedTeam): static
+    {
+        $this->assignedTeam = $assignedTeam;
+
+        return $this;
+    }
+
+    public function getCreatedBy(): ?Supervisor
+    {
+        return $this->createdBy;
+    }
+
+    public function setCreatedBy(?Supervisor $createdBy): static
+    {
+        $this->createdBy = $createdBy;
+
+        return $this;
+    }
+
+    public function getPriority(): ?string
+    {
+        return $this->priority;
+    }
+
+    public function setPriority(string $priority): static
+    {
+        $this->priority = $priority;
+
+        return $this;
+    }
+
+    public function getCreatedAt(): ?\DateTimeImmutable
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(\DateTimeImmutable $createdAt): static
+    {
+        $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    public function getUpdatedAt(): ?\DateTimeImmutable
+    {
+        return $this->updatedAt;
+    }
+
+    public function setUpdatedAt(?\DateTimeImmutable $updatedAt): static
+    {
+        $this->updatedAt = $updatedAt;
 
         return $this;
     }

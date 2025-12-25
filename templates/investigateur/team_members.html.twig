@@ -1,0 +1,295 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+	{{ team.name }}
+	- Team Members
+{% endblock %}
+
+{% block stylesheets %}
+	{{ parent() }}
+	<style>:root
+	{
+		--bg-dark: #0f172a;
+		--card-bg: #1e293b;
+		--card-border: #334155;
+		--text-primary: #f8fafc;
+		--text-secondary: #94a3b8;
+		--accent-blue: #3b82f6;
+		--sidebar-width: 280px;
+	}
+
+	body {
+		background-color: var(--bg-dark);
+		color: var(--text-primary);
+		font-family: 'Inter', system-ui, -apple-system, sans-serif;
+		margin: 0;
+	}
+
+	.team-members-container {
+		margin-left: var(--sidebar-width);
+		padding: 3rem;
+		min-height: 100vh;
+	}
+
+	.btn-back {
+		color: var(--text-secondary);
+		text-decoration: none;
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
+		margin-bottom: 2rem;
+		font-weight: 500;
+		transition: color 0.2s;
+	}
+
+	.btn-back:hover {
+		color: white;
+	}
+
+	.page-header {
+		margin-bottom: 3rem;
+	}
+
+	.team-badge {
+		display: inline-block;
+		padding: 0.5rem 1.25rem;
+		background: var(--accent-blue);
+		color: white;
+		border-radius: 8px;
+		font-weight: 700;
+		margin-bottom: 1rem;
+		font-size: 1.125rem;
+	}
+
+	.glass-card {
+		background: rgba(30, 41, 59, 0.4);
+		backdrop-filter: blur(12px);
+		border: 1px solid rgba(59, 130, 246, 0.3);
+		border-radius: 20px;
+		padding: 2.5rem;
+		box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+	}
+
+	.section-title {
+		font-size: 1.25rem;
+		font-weight: 700;
+		margin-bottom: 1.5rem;
+		color: var(--text-primary);
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+	}
+
+	.members-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+		gap: 1.5rem;
+		margin-bottom: 2rem;
+	}
+
+	.member-card {
+		background: rgba(30, 41, 59, 0.6);
+		border: 1px solid rgba(59, 130, 246, 0.2);
+		border-radius: 15px;
+		padding: 1.5rem;
+		transition: all 0.3s ease;
+		display: flex;
+		align-items: center;
+		gap: 1rem;
+	}
+
+	.member-card:hover {
+		transform: translateY(-3px);
+		border-color: var(--accent-blue);
+		background: rgba(30, 41, 59, 0.8);
+	}
+
+	.avatar-large {
+		width: 56px;
+		height: 56px;
+		background: rgba(59, 130, 246, 0.1);
+		border: 2px solid rgba(59, 130, 246, 0.3);
+		border-radius: 50%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		color: var(--accent-blue);
+		font-weight: 800;
+		font-size: 1.5rem;
+		flex-shrink: 0;
+	}
+
+	.member-info {
+		flex: 1;
+	}
+
+	.member-name {
+		font-weight: 700;
+		font-size: 1.125rem;
+		color: white;
+		margin-bottom: 0.25rem;
+	}
+
+	.member-email {
+		font-size: 0.875rem;
+		color: var(--text-secondary);
+	}
+
+	.role-badge {
+		display: inline-block;
+		padding: 0.25rem 0.75rem;
+		background: rgba(59, 130, 246, 0.1);
+		border: 1px solid rgba(59, 130, 246, 0.3);
+		color: var(--accent-blue);
+		border-radius: 6px;
+		font-size: 0.75rem;
+		font-weight: 600;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+		margin-top: 0.5rem;
+	}
+
+	.supervisor-card {
+		background: rgba(59, 130, 246, 0.1);
+		border: 1px solid rgba(59, 130, 246, 0.4);
+		border-radius: 15px;
+		padding: 2rem;
+		margin-bottom: 2rem;
+		display: flex;
+		align-items: center;
+		gap: 1.5rem;
+	}
+
+	.no-members {
+		text-align: center;
+		padding: 3rem 0;
+		color: var(--text-secondary);
+	}
+</style>{% endblock %}{% block body %}
+{% include 'componant/sidebar.html.twig' %}
+
+<div class="team-members-container">
+	<a href="{{ path('app_investigateur_teams') }}" class="btn-back">
+		<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewbox="0 0 24 24" stroke="currentColor">
+			<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+		</svg>
+		Back to My Teams
+	</a>
+
+	<header class="page-header">
+		<div class="team-badge">{{ team.name }}</div>
+		<h1 style="font-size: 2.5rem; font-weight: 800; margin: 0.5rem 0;">Team Members</h1>
+		<p style="color: var(--text-secondary);">View all members of this team</p>
+	</header>
+
+	<div
+		class="glass-card">
+		<!-- Supervisor/Creator Section -->
+		<div class="section-title">
+			<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewbox="0 0 24 24" stroke="currentColor">
+				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/>
+			</svg>
+			Team Creator
+		</div>
+
+		<div class="supervisor-card">
+			<div class="avatar-large">{{ team.supervisor.firstName|first|upper }}</div>
+			<div class="member-info">
+				<div class="member-name">{{ team.supervisor.firstName }}
+					{{ team.supervisor.lastName }}</div>
+				<div class="member-email">{{ team.supervisor.email }}</div>
+				<span class="role-badge">Creator / Supervisor</span>
+			</div>
+		</div>
+
+		<!-- Team Members Section -->
+		<div class="section-title">
+			<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewbox="0 0 24 24" stroke="currentColor">
+				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+			</svg>
+			Investigators ({{ team.investigateurs|length }})
+		</div>
+
+		{% if team.investigateurs|length > 0 %}
+			<div class="members-grid">
+				{% for investigator in team.investigateurs %}
+					<div class="member-card">
+						<div class="avatar-large">{{ investigator.firstName|first|upper }}</div>
+						<div class="member-info">
+							<div class="member-name">{{ investigator.firstName }}
+								{{ investigator.lastName }}</div>
+							<div class="member-email">{{ investigator.email }}</div>
+							<span class="role-badge">Investigator</span>
+						</div>
+					</div>
+				{% endfor %}
+			</div>
+		{% else %}
+			<div class="no-members">
+				<svg xmlns="http://www.w3.org/2000/svg" style="width: 3rem; height: 3rem; margin: 0 auto 1rem; color: var(--card-border);" fill="none" viewbox="0 0 24 24" stroke="currentColor">
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+				</svg>
+				<p>No investigators have been assigned to this team yet.</p>
+			</div>
+		{% endif %}
+
+		<!-- Team Cases Section -->
+		<div class="section-title" style="margin-top: 3rem;">
+			<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewbox="0 0 24 24" stroke="currentColor">
+				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+			</svg>
+			Team Cases ({{ team.caseWorks|length }})
+		</div>
+
+		{% if team.caseWorks|length > 0 %}
+			<div style="display: grid; gap: 1.5rem; margin-top: 1.5rem;">
+				{% for casework in team.caseWorks %}
+					<div class="member-card" style="cursor: pointer; padding: 1.5rem;" onclick="window.location='{{ path('app_investigateur_case_show', {'id': casework.id}) }}'">
+						<div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+							<div style="flex: 1;">
+								<div style="font-weight: 700; font-size: 1.125rem; margin-bottom: 0.5rem; color: white;">{{ casework.tittel }}</div>
+								<div style="display: flex; gap: 0.5rem; align-items: center; margin-bottom: 0.75rem;">
+									<span style="padding: 0.25rem 0.75rem; border-radius: 6px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase;
+																					{% if casework.priority == 'low' %}background: linear-gradient(135deg, #22c55e, #16a34a); color: white;
+																					{% elseif casework.priority == 'medium' %}background: linear-gradient(135deg, #eab308, #ca8a04); color: white;
+																					{% elseif casework.priority == 'high' %}background: linear-gradient(135deg, #f97316, #ea580c); color: white;
+																					{% elseif casework.priority == 'critical' %}background: linear-gradient(135deg, #ef4444, #dc2626); color: white;
+																					{% endif %}">
+										{{ casework.priority }}
+									</span>
+									<span style="padding: 0.25rem 0.75rem; border-radius: 6px; font-size: 0.75rem; font-weight: 600; text-transform: uppercase;
+																					{% if casework.statu == 'open' %}background: rgba(59, 130, 246, 0.2); color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.4);
+																					{% elseif casework.statu == 'in_progress' %}background: rgba(168, 85, 247, 0.2); color: #a855f7; border: 1px solid rgba(168, 85, 247, 0.4);
+																					{% elseif casework.statu == 'closed' %}background: rgba(107, 114, 128, 0.2); color: #9ca3af; border: 1px solid rgba(107, 114, 128, 0.4);
+																					{% endif %}">
+										{{ casework.statu|replace({'_': ' '}) }}
+									</span>
+								</div>
+								<div style="color: #94a3b8; font-size: 0.875rem; line-height: 1.6;">
+									{{ casework.discription|length > 150 ? casework.discription|slice(0, 150) ~ '...' : casework.discription }}
+								</div>
+							</div>
+							<div style="color: #3b82f6; font-size: 0.875rem; font-weight: 600; margin-left: 1rem;">
+								View →
+							</div>
+						</div>
+						<div style="display: flex; align-items: center; gap: 0.5rem; color: #94a3b8; font-size: 0.75rem; padding-top: 1rem; border-top: 1px solid rgba(59, 130, 246, 0.2);">
+							<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewbox="0 0 24 24" stroke="currentColor">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+							</svg>
+							Created
+							{{ casework.createdAt|date('M d, Y') }}
+						</div>
+					</div>
+				{% endfor %}
+			</div>
+		{% else %}
+			<div class="no-members">
+				<svg xmlns="http://www.w3.org/2000/svg" style="width: 3rem; height: 3rem; margin: 0 auto 1rem; color: var(--card-border);" fill="none" viewbox="0 0 24 24" stroke="currentColor">
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+				</svg>
+				<p>No cases assigned to this team yet.</p>
+			</div>
+		{% endif %}
+	</div>
+</div>{% endblock %}

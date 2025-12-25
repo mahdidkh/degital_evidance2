@@ -1,41 +1,252 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}CaseWork index{% endblock %}
+{% block title %}CaseWork index
+{% endblock %}
 
 {% block body %}
-    <h1>CaseWork index</h1>
+	<style>:root
+	{
+		--primary-color: #2563eb;
+		--primary-hover: #1d4ed8;
+		--bg-color: #f8fafc;
+		--card-bg: #ffffff;
+		--text-main: #1e293b;
+		--text-muted: #64748b;
+		--border-color: #e2e8f0;
+		--shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+		--shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+		--radius: 12px;
+	}
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Tittel</th>
-                <th>Statu</th>
-                <th>Discription</th>
-                <th>actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for case_work in case_works %}
-            <tr>
-                <td>{{ case_work.id }}</td>
-                <td>{{ case_work.tittel }}</td>
-                <td>{{ case_work.statu }}</td>
-                <td>{{ case_work.discription }}</td>
-                <td>
-                    <a href="{{ path('app_case_work_show', {'id': case_work.id}) }}">show</a>
-                    <a href="{{ path('app_case_work_edit', {'id': case_work.id}) }}">edit</a>
+	/* body {
+        background-color: var(--bg-color);
+        font-family: 'Public Sans', sans-serif;
+        color: var(--text-main);
+        margin: 0;
+    } */
 
-                    <a href="{{ path('app_evidance_new', {'case_id': case_work.id}) }}" class="btn btn-primary">Add Evidence</a>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="5">no records found</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+	.container {
+		max-width: 1200px;
+		margin: 2rem auto;
+		padding: 0 1.5rem;
+	}
 
-    <a href="{{ path('app_case_work_new') }}">Create new</a>
-{% endblock %}
+	.header {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		margin-bottom: 2rem;
+	}
+
+	.header h1 {
+		font-size: 2rem;
+		font-weight: 700;
+		color: white;
+		margin: 0;
+	}
+
+	.btn-create {
+		display: inline-flex;
+		align-items: center;
+		padding: 0.75rem 1.5rem;
+		background-color: var(--primary-color);
+		color: white;
+		border-radius: var(--radius);
+		text-decoration: none;
+		font-weight: 500;
+		transition: all 0.2s ease;
+		box-shadow: var(--shadow-sm);
+	}
+
+	.btn-create:hover {
+		background-color: var(--primary-hover);
+		transform: translateY(-1px);
+		box-shadow: var(--shadow-md);
+	}
+
+	.grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+		gap: 1.5rem;
+	}
+
+	.card {
+		background: var(--card-bg);
+		border-radius: var(--radius);
+		padding: 1.5rem;
+		border: 1px solid var(--border-color);
+		transition: all 0.2s ease;
+		display: flex;
+		flex-direction: column;
+		position: relative;
+		overflow: hidden;
+	}
+
+	.card:hover {
+		transform: translateY(-4px);
+		box-shadow: var(--shadow-md);
+		border-color: var(--primary-color);
+	}
+
+	.card-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: flex-start;
+		margin-bottom: 1rem;
+	}
+
+	.card-title {
+		font-size: 1.25rem;
+		font-weight: 600;
+		margin: 0;
+		color: var(--text-main);
+		line-height: 1.4;
+	}
+
+	.card-id {
+		font-size: 0.75rem;
+		color: var(--text-muted);
+		background: var(--bg-color);
+		padding: 0.25rem 0.5rem;
+		border-radius: 6px;
+		font-family: monospace;
+	}
+
+	.status-badge {
+		display: inline-block;
+		padding: 0.25rem 0.75rem;
+		border-radius: 9999px;
+		font-size: 0.75rem;
+		font-weight: 600;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+		margin-bottom: 1rem;
+	}
+
+	/* Dynamic status colors can be handled here if statuses are known. 
+           For now, using a default style. */
+	.status-badge {
+		background-color: #e0f2fe;
+		color: #0369a1;
+	}
+
+	.card-body {
+		color: var(--text-muted);
+		font-size: 0.95rem;
+		line-height: 1.6;
+		margin-bottom: 1.5rem;
+		flex-grow: 1;
+		display: -webkit-box;
+		-webkit-line-clamp: 3;
+		-webkit-box-orient: vertical;
+		overflow: hidden;
+	}
+
+	.card-footer {
+		margin-top: auto;
+		display: flex;
+		gap: 0.5rem;
+		border-top: 1px solid var(--border-color);
+		padding-top: 1rem;
+	}
+
+	.btn-action {
+		padding: 0.5rem 1rem;
+		border-radius: 8px;
+		font-size: 0.875rem;
+		font-weight: 500;
+		text-decoration: none;
+		transition: background-color 0.2s;
+		display: inline-flex;
+		align-items: center;
+		gap: 0.25rem;
+	}
+
+	.btn-view {
+		color: var(--primary-color);
+		background-color: #eff6ff;
+	}
+	.btn-view:hover {
+		background-color: #dbeafe;
+	}
+
+	.btn-edit {
+		color: var(--text-muted);
+		background-color: transparent;
+	}
+	.btn-edit:hover {
+		color: var(--text-main);
+		background-color: var(--bg-color);
+	}
+
+	.btn-evidence {
+		margin-left: auto;
+		color: #059669;
+		background-color: #ecfdf5;
+	}
+	.btn-evidence:hover {
+		background-color: #d1fae5;
+	}
+
+	.empty-state {
+		grid-column: 1 / -1;
+		text-align: center;
+		padding: 4rem;
+		background: var(--card-bg);
+		border-radius: var(--radius);
+		color: var(--text-muted);
+	}
+
+	/* Material Icons sizing */
+	.material-symbols-outlined {
+		font-size: 1.25rem;
+	}
+</style>
+
+<div class="container">
+	<div class="header">
+		<h1>Case work</h1>
+		<a href="{{ path('app_case_work_new') }}" class="btn-create">
+			<span class="material-symbols-outlined" style="margin-right: 0.5rem;">add</span>
+			Create New
+		</a>
+	</div>
+
+	<div class="grid">
+		{% for case_work in case_works %}
+			<div class="card">
+				<div class="card-header">
+					<div>
+						<span class="status-badge">{{ case_work.statu }}</span>
+						<h2 class="card-title">{{ case_work.tittel }}</h2>
+					</div>
+					<span class="card-id">#{{ case_work.id }}</span>
+				</div>
+
+				<div class="card-body">
+					{{ case_work.discription }}
+				</div>
+
+				<div class="card-footer">
+					<a href="{{ path('app_case_work_show', {'id': case_work.id}) }}" class="btn-action btn-view">
+						<span class="material-symbols-outlined">visibility</span>
+						View
+					</a>
+					<a href="{{ path('app_case_work_edit', {'id': case_work.id}) }}" class="btn-action btn-edit">
+						<span class="material-symbols-outlined">edit</span>
+						Edit
+					</a>
+					<a href="{{ path('app_evidance_new', {'case_id': case_work.id}) }}" class="btn-action btn-evidence" title="Add Evidence">
+						<span class="material-symbols-outlined">fingerprint</span>
+						Evidence
+					</a>
+				</div>
+			</div>
+		{% else %}
+			<div class="empty-state">
+				<span class="material-symbols-outlined" style="font-size: 3rem; margin-bottom: 1rem;">folder_off</span>
+				<p>No cases found. Create your first case to get started.</p>
+			</div>
+		{% endfor %}
+	</div>
+</div>{% endblock %}

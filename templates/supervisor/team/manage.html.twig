@@ -1,0 +1,309 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Manage Team:
+	{{ team.name }}
+{% endblock %}
+
+{% block stylesheets %}
+	{{ parent() }}
+	<style>:root
+	{
+		--bg-dark: #0f172a;
+		--card-bg: #1e293b;
+		--card-border: #334155;
+		--accent-blue: #3b82f6;
+		--text-primary: #f8fafc;
+		--text-secondary: #94a3b8;
+		--sidebar-width: 280px;
+	}
+
+	body {
+		background-color: var(--bg-dark);
+		color: var(--text-primary);
+		font-family: 'Inter', system-ui, -apple-system, sans-serif;
+		margin: 0;
+	}
+
+	.manage-container {
+		margin-left: var(--sidebar-width);
+		padding: 2rem;
+		min-height: 100vh;
+	}
+
+	.flash-messages-container {
+		margin-left: var(--sidebar-width);
+	}
+
+	.glass-card {
+		background: rgba(30, 41, 59, 0.7);
+		backdrop-filter: blur(10px);
+		border: 1px solid var(--card-border);
+		border-radius: 16px;
+		padding: 2rem;
+		margin-bottom: 2rem;
+	}
+
+	.page-header {
+		margin-bottom: 2rem;
+	}
+
+	.team-title {
+		font-size: 2.25rem;
+		font-weight: 800;
+		color: var(--accent-blue);
+		letter-spacing: -0.05em;
+	}
+
+	.member-row {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding: 1rem;
+		border-radius: 12px;
+		background: rgba(255, 255, 255, 0.03);
+		margin-bottom: 0.75rem;
+		transition: background 0.2s;
+	}
+
+	.member-row:hover {
+		background: rgba(255, 255, 255, 0.05);
+	}
+
+	.member-info {
+		display: flex;
+		align-items: center;
+		gap: 1rem;
+	}
+
+	.avatar {
+		width: 40px;
+		height: 40px;
+		background: var(--card-border);
+		border-radius: 50%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		font-weight: 700;
+		color: var(--accent-blue);
+	}
+
+	.btn-remove {
+		color: #ef4444;
+		background: rgba(239, 68, 68, 0.1);
+		border: 1px solid rgba(239, 68, 68, 0.2);
+		padding: 0.5rem 1rem;
+		border-radius: 8px;
+		font-size: 0.875rem;
+		transition: all 0.2s;
+	}
+
+	.btn-remove:hover {
+		background: #ef4444;
+		color: white;
+	}
+
+	.btn-add {
+		background: var(--accent-blue);
+		color: white;
+		border: none;
+		padding: 0.5rem 1rem;
+		border-radius: 8px;
+		font-size: 0.875rem;
+		font-weight: 600;
+		transition: all 0.2s;
+	}
+
+	.btn-add:hover {
+		background: #2563eb;
+	}
+
+	.btn-back {
+		color: var(--text-secondary);
+		text-decoration: none;
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
+		margin-bottom: 1.5rem;
+		font-weight: 500;
+	}
+
+	.btn-back:hover {
+		color: white;
+	}
+
+	.empty-state {
+		text-align: center;
+		color: var(--text-secondary);
+		padding: 2rem;
+		font-style: italic;
+	}
+
+	.section-title {
+		font-size: 1.25rem;
+		font-weight: 700;
+		margin-bottom: 1.5rem;
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+	}
+</style>{% endblock %}{% block body %}
+{% include 'componant/sidebar.html.twig' %}
+
+<div class="manage-container">
+	<a href="{{ path('app_supervisor_index') }}" class="btn-back">
+		<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewbox="0 0 24 24" stroke="currentColor">
+			<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+		</svg>
+		Back to Teams
+	</a>
+
+	<div class="page-header">
+		<div class="d-flex justify-content-between align-items-end">
+			<div>
+				<span class="text-secondary small text-uppercase tracking-wider">Managing Members for</span>
+				<h1 class="team-title">{{ team.name }}</h1>
+			</div>
+		</div>
+	</div>
+
+	<div
+		class="row">
+		<!-- Current Members -->
+		<div class="col-lg-7">
+			<div class="glass-card">
+				<h2 class="section-title">
+					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewbox="0 0 24 24" stroke="currentColor">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
+					</svg>
+					Current Members ({{ team.investigateurs|length }})
+				</h2>
+
+				{% for investigator in team.investigateurs %}
+					<div class="member-row">
+						<div class="member-info">
+							<div class="avatar">
+								{{ investigator.email|first|upper }}
+							</div>
+							<div>
+								<div class="font-weight-bold">{{ investigator.email }}</div>
+								<div class="text-secondary small">Investigator</div>
+							</div>
+						</div>
+						<form action="{{ path('app_supervisor_team_remove_member', {id: team.id, investigatorId: investigator.id}) }}" method="POST">
+							<button type="submit" class="btn-remove" onclick="return confirm('Remove this investigator from the team?')">
+								Remove
+							</button>
+						</form>
+					</div>
+				{% else %}
+					<div class="empty-state">
+						No members assigned to this team yet.
+					</div>
+				{% endfor %}
+			</div>
+		</div>
+
+		<!-- Available Investigators -->
+		<div class="col-lg-5">
+			<div class="glass-card">
+				<h2 class="section-title">
+					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewbox="0 0 24 24" stroke="currentColor">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
+					</svg>
+					Add Investigators
+				</h2>
+
+				{% if availableInvestigators is not empty %}
+					{% for inv in availableInvestigators %}
+						<div class="member-row">
+							<div class="member-info">
+								<div class="avatar" style="background: rgba(59, 130, 246, 0.1);">
+									{{ inv.email|first|upper }}
+								</div>
+								<div class="small">
+									<div class="font-weight-bold">{{ inv.email }}</div>
+									{% if inv.teams is not empty %}
+										<div class="text-warning small" style="font-size: 0.7rem;">In teams:
+											{% for t in inv.teams %}
+												{{ t.name }}
+												{% if not loop.last %},
+												{% endif %}
+											{% endfor %}
+										</div>
+									{% else %}
+										<div class="text-success small" style="font-size: 0.7rem;">No teams assigned</div>
+									{% endif %}
+								</div>
+							</div>
+							<form action="{{ path('app_supervisor_team_add_member', {id: team.id}) }}" method="POST">
+								<input type="hidden" name="investigatorId" value="{{ inv.id }}">
+								<button type="submit" class="btn-add">
+									Add
+								</button>
+							</form>
+						</div>
+					{% endfor %}
+				{% else %}
+					<div class="empty-state">
+						No more investigators available for assignment.
+					</div>
+				{% endif %}
+			</div>
+		</div>
+	</div>
+
+	<!-- Assigned Cases Section -->
+	<div class="glass-card" style="margin-top: 2rem;">
+		<h2 class="section-title">
+			<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewbox="0 0 24 24" stroke="currentColor">
+				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+			</svg>
+			Assigned Cases ({{ team.caseWorks|length }})
+		</h2>
+
+		{% if team.caseWorks|length > 0 %}
+			<div style="display: grid; gap: 1rem;">
+				{% for casework in team.caseWorks %}
+					<div class="member-row" style="cursor: pointer;" onclick="window.location='{{ path('app_supervisor_casework_show', {'id': casework.id}) }}'">
+						<div class="member-info" style="flex: 1;">
+							<div style="flex: 1;">
+								<div style="font-weight: 700; font-size: 1rem; margin-bottom: 0.25rem;">{{ casework.tittel }}</div>
+								<div style="color: var(--text-secondary); font-size: 0.875rem; margin-bottom: 0.5rem;">
+									{{ casework.discription|length > 100 ? casework.discription|slice(0, 100) ~ '...' : casework.discription }}
+								</div>
+								<div style="display: flex; gap: 0.5rem; align-items: center;">
+									<span style="padding: 0.25rem 0.75rem; border-radius: 6px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase;
+																					{% if casework.priority == 'low' %}background: linear-gradient(135deg, #22c55e, #16a34a); color: white;
+																					{% elseif casework.priority == 'medium' %}background: linear-gradient(135deg, #eab308, #ca8a04); color: white;
+																					{% elseif casework.priority == 'high' %}background: linear-gradient(135deg, #f97316, #ea580c); color: white;
+																					{% elseif casework.priority == 'critical' %}background: linear-gradient(135deg, #ef4444, #dc2626); color: white;
+																					{% endif %}">
+										{{ casework.priority }}
+									</span>
+									<span style="padding: 0.25rem 0.75rem; border-radius: 6px; font-size: 0.75rem; font-weight: 600; text-transform: uppercase;
+																					{% if casework.statu == 'open' %}background: rgba(59, 130, 246, 0.2); color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.4);
+																					{% elseif casework.statu == 'in_progress' %}background: rgba(168, 85, 247, 0.2); color: #a855f7; border: 1px solid rgba(168, 85, 247, 0.4);
+																					{% elseif casework.statu == 'closed' %}background: rgba(107, 114, 128, 0.2); color: #9ca3af; border: 1px solid rgba(107, 114, 128, 0.4);
+																					{% endif %}">
+										{{ casework.statu|replace({'_': ' '}) }}
+									</span>
+									<span style="color: var(--text-secondary); font-size: 0.75rem;">
+										Created
+										{{ casework.createdAt|date('M d, Y') }}
+									</span>
+								</div>
+							</div>
+						</div>
+						<div style="color: var(--accent-blue); font-size: 0.875rem; font-weight: 600;">
+							View →
+						</div>
+					</div>
+				{% endfor %}
+			</div>
+		{% else %}
+			<div class="empty-state">
+				No cases assigned to this team yet.
+			</div>
+		{% endif %}
+	</div>
+</div>{% endblock %}

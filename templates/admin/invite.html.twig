@@ -1,0 +1,44 @@
+{% extends 'admin/index.html.twig' %}
+
+{% block title %}Invite User
+{% endblock %}
+
+{% block content %}
+	<div style="max-width: 600px; margin: 0 auto; padding: 2rem;">
+		<h1 style="margin-bottom: 2rem;">Invite New Member</h1>
+
+		{% for message in app.flashes('success') %}
+			<div style="background-color: #d1fae5; color: #065f46; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; word-break: break-all;">
+				{{ message }}
+			</div>
+		{% endfor %}
+
+		{% for message in app.flashes('error') %}
+			<div style="background-color: #fee2e2; color: #991b1b; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem;">
+				{{ message }}
+			</div>
+		{% endfor %}
+
+		<div style="background: white; padding: 2rem; border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);">
+			{{ form_start(form, {'attr': {'class': 'auth-form'}}) }}
+
+			<div class="form-group" style="margin-bottom: 1.5rem;">
+				{{ form_label(form.email, null, {'label_attr': {'class': 'form-label', 'style': 'color: #0f172a;'}}) }}
+				{{ form_widget(form.email, {'attr': {'class': 'form-input', 'style': 'background-color: #f8fafc; color: #0f172a; border-color: #cbd5e1;', 'placeholder': 'colleague@example.com'}}) }}
+				{{ form_errors(form.email) }}
+			</div>
+
+			<div class="form-group" style="margin-bottom: 1.5rem;">
+				{{ form_label(form.role, null, {'label_attr': {'class': 'form-label', 'style': 'color: #0f172a;'}}) }}
+				{{ form_widget(form.role, {'attr': {'class': 'form-input', 'style': 'background-color: #f8fafc; color: #0f172a; border-color: #cbd5e1;'}}) }}
+				{{ form_errors(form.role) }}
+			</div>
+
+			<div style="margin-top: 2rem;">
+				{{ form_widget(form.submit, {'attr': {'class': 'auth-btn', 'style': 'background-color: #0f172a; color: white;'}}) }}
+			</div>
+
+			{{ form_end(form) }}
+		</div>
+	</div>
+{% endblock %}

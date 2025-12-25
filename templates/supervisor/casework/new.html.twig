@@ -1,0 +1,201 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Create New Case
+{% endblock %}
+
+{% block stylesheets %}
+	{{ parent() }}
+	<style>:root
+	{
+		--bg-dark: #0f172a;
+		--card-bg: #1e293b;
+		--card-border: #334155;
+		--text-primary: #f8fafc;
+		--text-secondary: #94a3b8;
+		--accent-blue: #3b82f6;
+		--sidebar-width: 280px;
+	}
+
+	body {
+		background-color: var(--bg-dark);
+		color: var(--text-primary);
+		font-family: 'Inter', system-ui, -apple-system, sans-serif;
+		margin: 0;
+	}
+
+	.casework-container {
+		margin-left: var(--sidebar-width);
+		padding: 3rem;
+		min-height: 100vh;
+	}
+
+	.btn-back {
+		color: var(--text-secondary);
+		text-decoration: none;
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
+		margin-bottom: 2rem;
+		font-weight: 500;
+		transition: color 0.2s;
+	}
+
+	.btn-back:hover {
+		color: white;
+	}
+
+	.glass-card {
+		background: rgba(30, 41, 59, 0.4);
+		backdrop-filter: blur(12px);
+		border: 1px solid rgba(59, 130, 246, 0.3);
+		border-radius: 20px;
+		padding: 3rem;
+		box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+	}
+
+	.form-group {
+		margin-bottom: 2rem;
+	}
+
+	.form-label {
+		display: block;
+		font-weight: 600;
+		margin-bottom: 0.5rem;
+		color: var(--text-primary);
+		font-size: 0.875rem;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+	}
+
+	.form-input,
+	.form-select,
+	.form-textarea {
+		width: 100%;
+		padding: 0.875rem;
+		background: rgba(15, 23, 42, 0.6);
+		border: 1px solid rgba(59, 130, 246, 0.3);
+		border-radius: 10px;
+		color: white;
+		font-size: 1rem;
+		transition: all 0.3s ease;
+	}
+
+	.form-textarea {
+		min-height: 150px;
+		resize: vertical;
+	}
+
+	.form-input:focus,
+	.form-select:focus,
+	.form-textarea:focus {
+		outline: none;
+		border-color: var(--accent-blue);
+		box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+	}
+
+	.form-select option {
+		background-color: #1e293b;
+		color: white;
+	}
+
+	.btn-submit {
+		padding: 1rem 2rem;
+		background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+		color: white;
+		border: none;
+		border-radius: 10px;
+		font-weight: 700;
+		font-size: 1rem;
+		cursor: pointer;
+		transition: all 0.3s ease;
+		box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+	}
+
+	.btn-submit:hover {
+		transform: translateY(-2px);
+		box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+	}
+
+	.priority-badge {
+		display: inline-block;
+		padding: 0.25rem 0.75rem;
+		border-radius: 6px;
+		font-size: 0.75rem;
+		font-weight: 600;
+		text-transform: uppercase;
+	}
+
+	.priority-low {
+		background: linear-gradient(135deg, #22c55e, #16a34a);
+		color: white;
+	}
+	.priority-medium {
+		background: linear-gradient(135deg, #eab308, #ca8a04);
+		color: white;
+	}
+	.priority-high {
+		background: linear-gradient(135deg, #f97316, #ea580c);
+		color: white;
+	}
+	.priority-critical {
+		background: linear-gradient(135deg, #ef4444, #dc2626);
+		color: white;
+	}
+</style>{% endblock %}{% block body %}
+{% include 'componant/sidebar.html.twig' %}
+
+<div class="casework-container">
+	<a href="{{ path('app_supervisor_casework_index') }}" class="btn-back">
+		<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewbox="0 0 24 24" stroke="currentColor">
+			<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+		</svg>
+		Back to Cases
+	</a>
+
+	<header style="margin-bottom: 3rem;">
+		<h1 style="font-size: 2.5rem; font-weight: 800; margin: 0;">Create New Case</h1>
+		<p style="color: var(--text-secondary); margin-top: 0.5rem;">Assign a new investigation case to a team</p>
+	</header>
+
+	<div class="glass-card">
+		<form method="POST">
+			<div class="form-group">
+				<label class="form-label" for="title">Case Title</label>
+				<input type="text" id="title" name="title" class="form-input" placeholder="Enter case title" required>
+			</div>
+
+			<div class="form-group">
+				<label class="form-label" for="description">Description</label>
+				<textarea id="description" name="description" class="form-textarea" placeholder="Provide a detailed description of the case" required></textarea>
+			</div>
+
+			<div class="form-group">
+				<label class="form-label" for="priority">Priority</label>
+				<select id="priority" name="priority" class="form-select" required>
+					<option value="">Select Priority</option>
+					<option value="low">🟢 Low</option>
+					<option value="medium" selected>🟡 Medium</option>
+					<option value="high">🟠 High</option>
+					<option value="critical">🔴 Critical</option>
+				</select>
+			</div>
+
+			<div class="form-group">
+				<label class="form-label" for="team_id">Assign to Team (Optional)</label>
+				<select id="team_id" name="team_id" class="form-select">
+					<option value="">No Team Assigned</option>
+					{% for team in teams %}
+						<option value="{{ team.id }}">{{ team.name }}</option>
+					{% endfor %}
+				</select>
+			</div>
+
+			<button type="submit" class="btn-submit">
+				<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewbox="0 0 24 24" stroke="currentColor" style="display: inline; vertical-align: middle; margin-right: 0.5rem;">
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+				</svg>
+				Create Case
+			</button>
+		</form>
+	</div>
+</div>{% endblock %}

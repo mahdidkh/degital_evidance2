@@ -29,6 +29,10 @@ class ChainOfCoady
     #[ORM\Column(length: 255)]
     private ?string $PreviosHash = null;
 
+    #[ORM\ManyToOne(targetEntity: Evidance::class, inversedBy: 'chainEntries')]
+    private ?Evidance $evidence = null;
+
+
     public function getId(): ?int
     {
         return $this->id;

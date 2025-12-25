@@ -1,11 +1,12 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello AdminController!{% endblock %}
+{% block title %}Hello AdminController!
+{% endblock %}
 
 {% block body %}
-    {% include 'componant/sidebar.html.twig' %}
-    
-    <main style="margin-left: 280px; padding: 20px; width: calc(100% - 280px);">
-        
-    </main>
+	{% include 'componant/sidebar.html.twig' %}
+
+	<main style="margin-left: 280px; padding: 20px; width: calc(100% - 280px);">
+		{% block content %}{% endblock %}
+	</main>
 {% endblock %}

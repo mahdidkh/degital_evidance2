@@ -61,6 +61,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface , TwoFac
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $emailAuthCode = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $invitationToken = null;
+
     #[ORM\Column]
     private bool $isVerified = false;
 
@@ -244,6 +247,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface , TwoFac
         $this->emailAuthCode = $emailAuthCode;
     }
 
+    public function getInvitationToken(): ?string
+    {
+        return $this->invitationToken;
+    }
+
+    public function setInvitationToken(?string $invitationToken): static
+    {
+        $this->invitationToken = $invitationToken;
+
+        return $this;
+    }
+
     public function isVerified(): bool
     {
         return $this->isVerified;
@@ -280,4 +295,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface , TwoFac
         return $this;
     }
 
+    public function getType(): string
+    {
+        return (new \ReflectionClass($this))->getShortName();
+    }
 }
