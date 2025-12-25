@@ -181,6 +181,28 @@
 		color: var(--accent-blue);
 		font-weight: 600;
 	}
+
+	.btn-explore {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.75rem;
+		padding: 0.6rem 1.125rem;
+		background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+		color: white;
+		border-radius: 12px;
+		text-decoration: none;
+		font-weight: 700;
+		font-size: 0.85rem;
+		transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+		box-shadow: 0 4px 15px -3px rgba(59, 130, 246, 0.4);
+		margin-left: auto;
+	}
+
+	.btn-explore:hover {
+		transform: translateY(-2px) scale(1.02);
+		box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.5);
+		filter: brightness(1.1);
+	}
 </style>{% endblock %}{% block body %}
 {% include 'componant/sidebar.html.twig' %}
 
@@ -202,6 +224,10 @@
 				<span class="status-badge status-{{ casework.statu }}">
 					{{ casework.statu|replace({'_': ' '}) }}
 				</span>
+				<a href="{{ path('app_investigateur_case_explore', {id: casework.id}) }}" class="btn-explore">
+					<span class="material-symbols-outlined">rocket_launch</span>
+					Explore Case
+				</a>
 			</div>
 		</div>
 

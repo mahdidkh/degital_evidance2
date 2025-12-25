@@ -19,8 +19,32 @@ final class CaseWorkController extends AbstractController
     #[Route(name: 'app_case_work_index', methods: ['GET'])]
     public function index(CaseWorkRepository $caseWorkRepository): Response
     {
+        $user = $this->getUser();
+        $cases = [];
+
+        // Check user role and filter cases accordingly
+        if ($this->isGranted('ROLE_ADMIN')) {
+            // Admins can see all cases
+            $cases = $caseWorkRepository->findAll();
+        } elseif ($this->isGranted('ROLE_SUPERVISOR')) {
+            // Supervisors see cases they created
+            $cases = $caseWorkRepository->findBy(['createdBy' => $user], ['createdAt' => 'DESC']);
+        } elseif ($this->isGranted('ROLE_INVESTIGATEUR')) {
+            // Investigators only see cases assigned to their teams
+            $teams = $user->getTeams();
+            foreach ($teams as $team) {
+                foreach ($team->getCaseWorks() as $casework) {
+                    $cases[] = $casework;
+                }
+            }
+            // Sort by creation date (newest first)
+            usort($cases, function($a, $b) {
+                return $b->getCreatedAt() <=> $a->getCreatedAt();
+            });
+        }
+
         return $this->render('case_work/index.html.twig', [
-            'case_works' => $caseWorkRepository->findAll(),
+            'case_works' => $cases,
         ]);
     }
 

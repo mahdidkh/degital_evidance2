@@ -83,4 +83,21 @@ class InvestigateurController extends AbstractController
             'casework' => $casework,
         ]);
     }
+
+    #[Route('/investigateur/case/{id}/explore', name: 'app_investigateur_case_explore')]
+    public function exploreCase(CaseWork $casework): Response
+    {
+        /** @var \App\Entity\User $user */
+        $user = $this->getUser();
+        
+        // Check if the case is assigned to one of the investigator's teams
+        $assignedTeam = $casework->getAssignedTeam();
+        if (!$assignedTeam || !$user->getTeams()->contains($assignedTeam)) {
+            throw $this->createAccessDeniedException('You do not have access to this case.');
+        }
+
+        return $this->render('investigateur/explore.html.twig', [
+            'casework' => $casework,
+        ]);
+    }
 }

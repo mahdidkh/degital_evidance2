@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\EvidanceRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: EvidanceRepository::class)]
@@ -32,6 +34,17 @@ class Evidance
 
     #[ORM\ManyToOne(inversedBy: 'evidances')]
     private ?CaseWork $caseWork = null;
+
+    /**
+     * @var Collection<int, ChainOfCoady>
+     */
+    #[ORM\OneToMany(targetEntity: ChainOfCoady::class, mappedBy: 'evidence')]
+    private Collection $chainEntries;
+
+    public function __construct()
+    {
+        $this->chainEntries = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -98,6 +111,36 @@ class Evidance
     public function setCaseWork(?CaseWork $caseWork): static
     {
         $this->caseWork = $caseWork;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ChainOfCoady>
+     */
+    public function getChainEntries(): Collection
+    {
+        return $this->chainEntries;
+    }
+
+    public function addChainEntry(ChainOfCoady $chainEntry): static
+    {
+        if (!$this->chainEntries->contains($chainEntry)) {
+            $this->chainEntries->add($chainEntry);
+            $chainEntry->setEvidence($this);
+        }
+
+        return $this;
+    }
+
+    public function removeChainEntry(ChainOfCoady $chainEntry): static
+    {
+        if ($this->chainEntries->removeElement($chainEntry)) {
+            // set the owning side to null (unless already changed)
+            if ($chainEntry->getEvidence() === $this) {
+                $chainEntry->setEvidence(null);
+            }
+        }
 
         return $this;
     }

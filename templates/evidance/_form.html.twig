@@ -1,4 +1,32 @@
-{{ form_start(form) }}
-    {{ form_widget(form) }}
-    <button class="btn">{{ button_label|default('Save') }}</button>
-{{ form_end(form) }}
+<div class="form-container">
+	{{ form_start(form, {'attr': {'class': 'modern-form'}}) }}
+	<div class="form-grid">
+		<div class="form-row full-width">
+			{{ form_row(form.tittel, {'attr': {'class': 'form-input'}}) }}
+		</div>
+
+		<div class="form-row">
+			{{ form_row(form.discription, {'attr': {'class': 'form-input'}}) }}
+		</div>
+
+		<div class="form-row">
+			{{ form_row(form.remarque, {'attr': {'class': 'form-input'}}) }}
+		</div>
+
+		<div class="form-row">
+			{{ form_row(form.evidenceFile, {'attr': {'class': 'form-input-file'}}) }}
+		</div>
+
+		<div class="form-row">
+			{{ form_row(form.caseWork, {'attr': {'class': 'form-select'}}) }}
+		</div>
+	</div>
+
+	<div class="form-actions">
+		<button class="btn-submit">
+			<span class="material-symbols-outlined">add_circle</span>
+			{{ button_label|default('Ajouter Evidence') }}
+		</button>
+	</div>
+	{{ form_end(form) }}
+</div>
