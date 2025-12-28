@@ -223,20 +223,20 @@
 			<div class="card">
 				<div class="card-header">
 					<div>
-						<span class="status-badge">{{ case_work.statu }}</span>
+						<span class="status-badge">{{ case_work.status }}</span>
 						{% if case_work.assignedTeam %}
 							<span class="status-badge team-badge">
 								<span class="material-symbols-outlined" style="font-size: 1rem; vertical-align: middle;">group</span>
 								{{ case_work.assignedTeam.name }}
 							</span>
 						{% endif %}
-						<h2 class="card-title">{{ case_work.tittel }}</h2>
+						<h2 class="card-title">{{ case_work.title }}</h2>
 					</div>
 					<span class="card-id">#{{ case_work.id }}</span>
 				</div>
 
 				<div class="card-body">
-					{{ case_work.discription }}
+					{{ case_work.description }}
 				</div>
 
 				<div class="card-footer">
@@ -248,10 +248,12 @@
 						<span class="material-symbols-outlined">edit</span>
 						Edit
 					</a>
-					<a href="{{ path('app_evidance_new', {'case_id': case_work.id}) }}" class="btn-action btn-evidence" title="Add Evidence">
-						<span class="material-symbols-outlined">fingerprint</span>
-						Evidence
-					</a>
+					{% if case_work.status == 'open' %}
+						<a href="{{ path('app_evidence_new', {'case_id': case_work.id}) }}" class="btn-action btn-evidence" title="Add Evidence">
+							<span class="material-symbols-outlined">fingerprint</span>
+							Evidence
+						</a>
+					{% endif %}
 				</div>
 			</div>
 		{% else %}

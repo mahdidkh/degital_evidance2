@@ -1,0 +1,176 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Case Archives
+{% endblock %}
+
+{% block stylesheets %}
+	{{ parent() }}
+	<style>:root
+	{
+		--bg-dark: #0f172a;
+		--card-bg: #1e293b;
+		--text-primary: #f8fafc;
+		--text-secondary: #94a3b8;
+		--accent-blue: #3b82f6;
+		--sidebar-width: 280px;
+	}
+
+	body {
+		background-color: var(--bg-dark);
+		color: var(--text-primary);
+		font-family: 'Inter', system-ui, -apple-system, sans-serif;
+		margin: 0;
+	}
+
+	.archive-container {
+		margin-left: var(--sidebar-width);
+		padding: 3rem;
+		min-height: 100vh;
+	}
+
+	.page-header {
+		margin-bottom: 3rem;
+		display: flex;
+		align-items: center;
+		gap: 1rem;
+	}
+
+	.archive-icon {
+		background: rgba(148, 163, 184, 0.1);
+		color: #94a3b8;
+		padding: 1rem;
+		border-radius: 12px;
+	}
+
+	.cases-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+		gap: 2rem;
+	}
+
+	.case-card {
+		background: rgba(30, 41, 59, 0.3);
+		backdrop-filter: blur(12px);
+		border: 1px solid rgba(148, 163, 184, 0.2);
+		border-radius: 20px;
+		padding: 2rem;
+		transition: all 0.3s ease;
+		cursor: pointer;
+		opacity: 0.8;
+	}
+
+	.case-card:hover {
+		transform: translateY(-5px);
+		border-color: #94a3b8;
+		background: rgba(30, 41, 59, 0.5);
+		opacity: 1;
+	}
+
+	.case-title {
+		font-size: 1.25rem;
+		font-weight: 800;
+		color: #cbd5e1;
+		margin: 0 0 0.5rem;
+	}
+
+	.case-description {
+		color: #64748b;
+		margin-bottom: 1.5rem;
+		line-height: 1.6;
+		display: -webkit-box;
+		-webkit-line-clamp: 3;
+		-webkit-box-orient: vertical;
+		overflow: hidden;
+	}
+
+	.case-meta {
+		display: flex;
+		gap: 1rem;
+		margin-top: 1.5rem;
+		padding-top: 1.5rem;
+		border-top: 1px solid rgba(148, 163, 184, 0.1);
+		font-size: 0.875rem;
+		color: #64748b;
+	}
+
+	.status-badge {
+		padding: 0.375rem 0.875rem;
+		border-radius: 8px;
+		font-size: 0.75rem;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+		background: rgba(148, 163, 184, 0.1);
+		color: #94a3b8;
+	}
+
+	.no-archives {
+		text-align: center;
+		padding: 4rem 0;
+		color: var(--text-secondary);
+		grid-column: 1 / -1;
+	}
+
+	.btn-back {
+		color: var(--text-secondary);
+		text-decoration: none;
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
+		margin-bottom: 2rem;
+		font-weight: 500;
+		transition: color 0.2s;
+	}
+</style>{% endblock %}{% block body %}
+{% include 'componant/sidebar_supervisor.html.twig' %}
+
+<div class="archive-container">
+	<a href="{{ path('app_supervisor_casework_index') }}" class="btn-back">
+		<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewbox="0 0 24 24" stroke="currentColor">
+			<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+		</svg>
+		Back to Active Cases
+	</a>
+
+	<div class="page-header">
+		<div class="archive-icon">
+			<span class="material-symbols-outlined" style="font-size: 2.5rem;">archive</span>
+		</div>
+		<div>
+			<h1 style="font-size: 2.5rem; font-weight: 800; margin: 0;">Case Archives</h1>
+			<p style="color: var(--text-secondary); margin-top: 0.5rem;">
+				{{ caseworks|length }}
+				archived case{{ caseworks|length != 1 ? 's' : '' }}
+			</p>
+		</div>
+	</div>
+
+	<div class="cases-grid">
+		{% for casework in caseworks %}
+			<div class="case-card" onclick="window.location='{{ path('app_supervisor_casework_show', {'id': casework.id}) }}'">
+				<h3 class="case-title">{{ casework.title }}</h3>
+				<span class="status-badge">ARCHIVED</span>
+				<p class="case-description" style="margin-top: 1rem;">{{ casework.description }}</p>
+
+				<div class="case-meta">
+					<div style="display: flex; align-items: center; gap: 0.5rem;">
+						<span class="material-symbols-outlined" style="font-size: 1rem;">calendar_today</span>
+						Archived:
+						{{ casework.updatedAt|date('M d, Y') }}
+					</div>
+					{% if casework.assignedTeam %}
+						<div style="display: flex; align-items: center; gap: 0.5rem;">
+							<span class="material-symbols-outlined" style="font-size: 1rem;">group</span>
+							{{ casework.assignedTeam.name }}
+						</div>
+					{% endif %}
+				</div>
+			</div>
+		{% else %}
+			<div class="no-archives">
+				<span class="material-symbols-outlined" style="font-size: 4rem; opacity: 0.2; margin-bottom: 1rem;">inventory_2</span>
+				<p>No cases have been archived yet.</p>
+			</div>
+		{% endfor %}
+	</div>
+</div>{% endblock %}

@@ -147,7 +147,7 @@
 		gap: 0.5rem;
 	}
 </style>{% endblock %}{% block body %}
-{% include 'componant/sidebar.html.twig' %}
+{% include 'componant/sidebar_supervisor.html.twig' %}
 
 <div class="manage-container">
 	<a href="{{ path('app_supervisor_index') }}" class="btn-back">
@@ -267,25 +267,25 @@
 					<div class="member-row" style="cursor: pointer;" onclick="window.location='{{ path('app_supervisor_casework_show', {'id': casework.id}) }}'">
 						<div class="member-info" style="flex: 1;">
 							<div style="flex: 1;">
-								<div style="font-weight: 700; font-size: 1rem; margin-bottom: 0.25rem;">{{ casework.tittel }}</div>
+								<div style="font-weight: 700; font-size: 1rem; margin-bottom: 0.25rem;">{{ casework.title }}</div>
 								<div style="color: var(--text-secondary); font-size: 0.875rem; margin-bottom: 0.5rem;">
-									{{ casework.discription|length > 100 ? casework.discription|slice(0, 100) ~ '...' : casework.discription }}
+									{{ casework.description|length > 100 ? casework.description|slice(0, 100) ~ '...' : casework.description }}
 								</div>
 								<div style="display: flex; gap: 0.5rem; align-items: center;">
 									<span style="padding: 0.25rem 0.75rem; border-radius: 6px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase;
-																					{% if casework.priority == 'low' %}background: linear-gradient(135deg, #22c55e, #16a34a); color: white;
-																					{% elseif casework.priority == 'medium' %}background: linear-gradient(135deg, #eab308, #ca8a04); color: white;
-																					{% elseif casework.priority == 'high' %}background: linear-gradient(135deg, #f97316, #ea580c); color: white;
-																					{% elseif casework.priority == 'critical' %}background: linear-gradient(135deg, #ef4444, #dc2626); color: white;
-																					{% endif %}">
+																																{% if casework.priority == 'low' %}background: linear-gradient(135deg, #22c55e, #16a34a); color: white;
+																																{% elseif casework.priority == 'medium' %}background: linear-gradient(135deg, #eab308, #ca8a04); color: white;
+																																{% elseif casework.priority == 'high' %}background: linear-gradient(135deg, #f97316, #ea580c); color: white;
+																																{% elseif casework.priority == 'critical' %}background: linear-gradient(135deg, #ef4444, #dc2626); color: white;
+																																{% endif %}">
 										{{ casework.priority }}
 									</span>
 									<span style="padding: 0.25rem 0.75rem; border-radius: 6px; font-size: 0.75rem; font-weight: 600; text-transform: uppercase;
-																					{% if casework.statu == 'open' %}background: rgba(59, 130, 246, 0.2); color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.4);
-																					{% elseif casework.statu == 'in_progress' %}background: rgba(168, 85, 247, 0.2); color: #a855f7; border: 1px solid rgba(168, 85, 247, 0.4);
-																					{% elseif casework.statu == 'closed' %}background: rgba(107, 114, 128, 0.2); color: #9ca3af; border: 1px solid rgba(107, 114, 128, 0.4);
-																					{% endif %}">
-										{{ casework.statu|replace({'_': ' '}) }}
+																																{% if casework.status == 'open' %}background: rgba(59, 130, 246, 0.2); color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.4);
+																																{% elseif casework.status == 'in_progress' %}background: rgba(168, 85, 247, 0.2); color: #a855f7; border: 1px solid rgba(168, 85, 247, 0.4);
+																																{% elseif casework.status == 'closed' %}background: rgba(107, 114, 128, 0.2); color: #9ca3af; border: 1px solid rgba(107, 114, 128, 0.4);
+																																{% endif %}">
+										{{ casework.status|replace({'_': ' '}) }}
 									</span>
 									<span style="color: var(--text-secondary); font-size: 0.75rem;">
 										Created

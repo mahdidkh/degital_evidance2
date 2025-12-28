@@ -1,0 +1,70 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Evidence index
+{% endblock %}
+
+{% block body %}
+	<h1>Evidence index</h1>
+
+	<table class="table">
+		<thead>
+			<tr>
+				<th>Id</th>
+				<th>Titre</th>
+				<th>Description</th>
+				<th>Remarque</th>
+				<th>Fichier</th>
+				<th>Hash</th>
+				<th>Actions</th>
+			</tr>
+		</thead>
+
+		<tbody>
+			{% for evidence in evidences %}
+				<tr>
+					<td>{{ evidence.id }}</td>
+					<td>{{ evidence.title }}</td>
+					<td>{{ evidence.description }}</td>
+					<td>{{ evidence.remarque }}</td>
+
+					<td>
+						{% if evidence.storedFilename %}
+							<a href="{{ asset('uploads/evidence/' ~ evidence.storedFilename) }}" target="_blank">
+								ouvrir
+							</a>
+						{% else %}
+							<em>Aucun fichier</em>
+						{% endif %}
+					</td>
+
+					<td>
+						{% if evidence.fileHash %}
+							<small>{{ evidence.fileHash }}</small>
+						{% else %}
+							-
+						{% endif %}
+					</td>
+
+					<td>
+						<a class="btn btn-info btn-sm" href="{{ path('app_evidence_show', {'id': evidence.id}) }}">Voir</a>
+						<a class="btn btn-warning btn-sm" href="{{ path('app_evidence_edit', {'id': evidence.id}) }}">Modifier</a>
+
+						{# Bouton supprimer #}
+						<form action="{{ path('app_evidence_delete', {'id': evidence.id}) }}" method="post" style="display: inline-block;" onsubmit="return confirm('Supprimer cet élément ?');">
+
+							<input type="hidden" name="_token" value="{{ csrf_token('delete' ~ evidence.id) }}">
+							<button class="btn btn-danger btn-sm">Supprimer</button>
+						</form>
+					</td>
+				</tr>
+			{% else %}
+				<tr>
+					<td colspan="7">Aucun enregistrement trouvé.</td>
+				</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+
+	<a class="btn btn-primary" href="{{ path('app_evidence_new') }}">Créer nouveau</a>
+
+{% endblock %}

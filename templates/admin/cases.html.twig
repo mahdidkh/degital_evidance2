@@ -1,0 +1,225 @@
+{% extends 'admin/layout.html.twig' %}
+
+{% block title %}Case Oversight
+{% endblock %}
+
+{% block stylesheets %}
+	{{ parent() }}
+	<style>
+		.case-table-panel {
+			background: var(--card-bg);
+			backdrop-filter: blur(16px);
+			border: 1px solid var(--border-glass);
+			border-radius: 28px;
+			padding: 2rem;
+			overflow: hidden;
+		}
+
+		.case-table {
+			width: 100%;
+			border-collapse: collapse;
+			margin-top: 1rem;
+		}
+
+		.case-table th {
+			text-align: left;
+			padding: 1.25rem 1rem;
+			color: var(--text-secondary);
+			font-size: 0.85rem;
+			font-weight: 700;
+			text-transform: uppercase;
+			letter-spacing: 0.05em;
+			border-bottom: 1px solid var(--border-glass);
+		}
+
+		.case-table td {
+			padding: 1.25rem 1rem;
+			border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+			vertical-align: middle;
+		}
+
+		.case-row:hover {
+			background: rgba(255, 255, 255, 0.02);
+		}
+
+		.priority-badge {
+			padding: 4px 10px;
+			border-radius: 8px;
+			font-size: 0.7rem;
+			font-weight: 800;
+			text-transform: uppercase;
+		}
+
+		.priority-high {
+			background: rgba(239, 68, 68, 0.1);
+			color: #ef4444;
+			border: 1px solid rgba(239, 68, 68, 0.2);
+		}
+		.priority-medium {
+			background: rgba(245, 158, 11, 0.1);
+			color: #f59e0b;
+			border: 1px solid rgba(245, 158, 11, 0.2);
+		}
+		.priority-low {
+			background: rgba(16, 185, 129, 0.1);
+			color: #10b981;
+			border: 1px solid rgba(16, 185, 129, 0.2);
+		}
+
+		.status-chip {
+			display: inline-flex;
+			align-items: center;
+			gap: 0.5rem;
+			padding: 6px 12px;
+			border-radius: 20px;
+			font-size: 0.8rem;
+			font-weight: 600;
+			background: rgba(255, 255, 255, 0.05);
+			color: var(--text-primary);
+		}
+
+		.team-box {
+			background: rgba(139, 92, 246, 0.05);
+			border: 1px solid rgba(139, 92, 246, 0.1);
+			padding: 8px 12px;
+			border-radius: 12px;
+			display: inline-flex;
+			flex-direction: column;
+			gap: 4px;
+		}
+
+		.team-name {
+			color: var(--accent-purple);
+			font-weight: 700;
+			font-size: 0.9rem;
+		}
+
+		.member-count {
+			font-size: 0.75rem;
+			color: var(--text-secondary);
+		}
+
+		.investigator-avatars {
+			display: flex;
+			align-items: center;
+		}
+
+		.mini-avatar {
+			width: 32px;
+			height: 32px;
+			border-radius: 50%;
+			border: 2px solid var(--bg-dark);
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			font-size: 0.7rem;
+			font-weight: 700;
+			color: white;
+			margin-left: -8px;
+		}
+
+		.mini-avatar:first-child {
+			margin-left: 0;
+		}
+
+		.case-title-cell {
+			display: flex;
+			flex-direction: column;
+		}
+
+		.case-title-text {
+			font-weight: 700;
+			color: white;
+		}
+
+		.case-date {
+			font-size: 0.75rem;
+			color: var(--text-secondary);
+		}
+	</style>
+{% endblock %}
+
+{% block admin_content %}
+	<header class="page-header">
+		<div>
+			<h1 class="page-title">Forensic Case Oversight</h1>
+			<p style="color: var(--text-secondary); font-weight: 500;">Complete overview of system-wide investigations and team assignments</p>
+		</div>
+	</header>
+
+	<div class="case-table-panel">
+		<table class="case-table">
+			<thead>
+				<tr>
+					<th>Case Details</th>
+					<th>Priority & status</th>
+					<th>Assigned Team</th>
+					<th>Active Investigators</th>
+					<th>Actions</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for case in cases %}
+					<tr class="case-row">
+						<td>
+							<div class="case-title-cell">
+								<span class="case-title-text">{{ case.title }}</span>
+								<span class="case-date">Created on
+									{{ case.createdAt|date('M d, Y') }}</span>
+							</div>
+						</td>
+						<td>
+							<div style="display: flex; flex-direction: column; gap: 8px; align-items: flex-start;">
+								<span class="priority-badge priority-{{ case.priority|default('medium') }}">
+									{{ case.priority|capitalize }}
+								</span>
+								<div class="status-chip">
+									<span style="opacity: 0.7; font-size: 0.7rem;">●</span>
+									{{ case.status|capitalize }}
+								</div>
+							</div>
+						</td>
+						<td>
+							{% if case.assignedTeam %}
+								<div class="team-box">
+									<span class="team-name">{{ case.assignedTeam.name }}</span>
+									<span class="member-count">{{ case.assignedTeam.investigateurs|length }}
+										members</span>
+								</div>
+							{% else %}
+								<span style="color: var(--text-secondary); font-style: italic; font-size: 0.85rem;">Unassigned</span>
+							{% endif %}
+						</td>
+						<td>
+							<div class="investigator-avatars">
+								{% set team_members = case.assignedTeam ? case.assignedTeam.investigateurs : [] %}
+								{% for member in team_members|slice(0, 4) %}
+									<div class="mini-avatar" style="background: {{ cycle(['#3b82f6', '#8b5cf6', '#10b981', '#f59e0b'], loop.index0) }};" title="{{ member.firstName }} {{ member.lastName }}">
+										{{ member.firstName|slice(0,1) }}{{ member.lastName|slice(0,1) }}
+									</div>
+								{% endfor %}
+								{% if team_members|length > 4 %}
+									<div class="mini-avatar" style="background: #374151; font-size: 0.6rem;">+{{ team_members|length - 4 }}</div>
+								{% endif %}
+								{% if team_members|length == 0 %}
+									<span style="color: var(--text-secondary); font-size: 0.85rem;">No members</span>
+								{% endif %}
+							</div>
+						</td>
+						<td>
+							<a href="{{ path('app_admin_case_explore', {'id': case.id}) }}" class="actions-btn" title="View Details" style="display: inline-flex; align-items: center; justify-content: center; text-decoration: none;">
+								<span class="material-symbols-outlined" style="font-size: 1.25rem;">visibility</span>
+							</a>
+						</td>
+					</tr>
+				{% else %}
+					<tr>
+						<td colspan="5" style="text-align: center; padding: 4rem; color: var(--text-secondary);">
+							No forensic cases are currently registered in the system.
+						</td>
+					</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	</div>
+{% endblock %}

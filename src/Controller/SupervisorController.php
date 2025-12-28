@@ -12,6 +12,9 @@ use App\Entity\Team;
 use App\Entity\Supervisor;
 use App\Entity\Investigateur;
 use App\Entity\CaseWork;
+use App\Entity\Evidence;
+use App\Entity\ChainOfCustody;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 #[IsGranted('ROLE_SUPERVISOR')]
 class SupervisorController extends AbstractController
@@ -34,7 +37,7 @@ class SupervisorController extends AbstractController
     }
 
     #[Route('/supervisor/team/new', name: 'app_supervisor_team_new', methods: ['GET', 'POST'])]
-    public function newTeam(Request $request, EntityManagerInterface $entityManager): Response
+    public function newTeam(Request $request, EntityManagerInterface $entityManager, \App\Service\AuditService $auditService): Response
     {
         /** @var Supervisor $supervisor */
         $supervisor = $this->getUser();
@@ -56,6 +59,15 @@ class SupervisorController extends AbstractController
 
             $entityManager->persist($team);
             $entityManager->flush();
+
+            // Log team creation
+            $auditService->logGenericEvent(
+                'team_created',
+                sprintf('Supervisor "%s %s" created new team "%s"', $supervisor->getFirstName(), $supervisor->getLastName(), $teamName),
+                $supervisor,
+                'info',
+                ['team_name' => $teamName, 'team_id' => $team->getId()]
+            );
 
             $this->addFlash('success', 'Team created successfully.');
 
@@ -95,7 +107,7 @@ class SupervisorController extends AbstractController
     }
 
     #[Route('/supervisor/team/{id}/add-member', name: 'app_supervisor_team_add_member', methods: ['POST'])]
-    public function addMember(Team $team, Request $request, EntityManagerInterface $entityManager): Response
+    public function addMember(Team $team, Request $request, EntityManagerInterface $entityManager, \App\Service\AuditService $auditService): Response
     {
         /** @var Supervisor $supervisor */
         $supervisor = $this->getUser();
@@ -126,13 +138,16 @@ class SupervisorController extends AbstractController
         $investigator->addTeam($team);
         $entityManager->flush();
 
+        // Log team membership change
+        $auditService->logTeamMembershipChange($supervisor, $investigator, $team->getName(), 'added');
+
         $this->addFlash('success', sprintf('%s added to team %s.', $investigator->getEmail(), $team->getName()));
 
         return $this->redirectToRoute('app_supervisor_team_manage', ['id' => $team->getId()]);
     }
 
     #[Route('/supervisor/team/{id}/remove-member/{investigatorId}', name: 'app_supervisor_team_remove_member', methods: ['POST'])]
-    public function removeMember(Team $team, int $investigatorId, EntityManagerInterface $entityManager): Response
+    public function removeMember(Team $team, int $investigatorId, EntityManagerInterface $entityManager, \App\Service\AuditService $auditService): Response
     {
         /** @var Supervisor $supervisor */
         $supervisor = $this->getUser();
@@ -151,6 +166,9 @@ class SupervisorController extends AbstractController
         $investigator->removeTeam($team);
         $entityManager->flush();
 
+        // Log team membership change
+        $auditService->logTeamMembershipChange($supervisor, $investigator, $team->getName(), 'removed');
+
         $this->addFlash('success', sprintf('%s removed from team %s.', $investigator->getEmail(), $team->getName()));
 
         return $this->redirectToRoute('app_supervisor_team_manage', ['id' => $team->getId()]);
@@ -165,10 +183,39 @@ class SupervisorController extends AbstractController
         if (!$supervisor instanceof Supervisor) {
             throw $this->createAccessDeniedException('You are not a valid supervisor.');
         }
-
-        $caseworks = $entityManager->getRepository(CaseWork::class)->findBy(['createdBy' => $supervisor], ['createdAt' => 'DESC']);
+        
+        // Only fetch cases created by this supervisor that are NOT archived
+        $caseworks = $entityManager->getRepository(CaseWork::class)->createQueryBuilder('c')
+            ->where('c.createdBy = :supervisor')
+            ->andWhere('c.status != :status')
+            ->setParameter('supervisor', $supervisor)
+            ->setParameter('status', 'archived')
+            ->orderBy('c.createdAt', 'DESC')
+            ->getQuery()
+            ->getResult();
 
         return $this->render('supervisor/casework/index.html.twig', [
+            'caseworks' => $caseworks,
+        ]);
+    }
+
+    #[Route('/supervisor/archive', name: 'app_supervisor_archive_index', methods: ['GET'])]
+    public function archiveIndex(EntityManagerInterface $entityManager): Response
+    {
+        /** @var Supervisor $supervisor */
+        $supervisor = $this->getUser();
+        
+        if (!$supervisor instanceof Supervisor) {
+            throw $this->createAccessDeniedException('You are not a valid supervisor.');
+        }
+
+        // Only fetch cases created by this supervisor that ARE archived
+        $caseworks = $entityManager->getRepository(CaseWork::class)->findBy(
+            ['createdBy' => $supervisor, 'status' => 'archived'],
+            ['updatedAt' => 'DESC']
+        );
+
+        return $this->render('supervisor/casework/archive.html.twig', [
             'caseworks' => $caseworks,
         ]);
     }
@@ -197,10 +244,10 @@ class SupervisorController extends AbstractController
             }
 
             $casework = new CaseWork();
-            $casework->setTittel($title);
-            $casework->setDiscription($description);
+            $casework->settitle($title);
+            $casework->setdescription($description);
             $casework->setPriority($priority);
-            $casework->setStatu('open');
+            $casework->setstatus('open');
             $casework->setCreatedBy($supervisor);
 
             if ($teamId) {
@@ -238,4 +285,134 @@ class SupervisorController extends AbstractController
         ]);
     }
 
+    #[Route('/supervisor/casework/{id}/status', name: 'app_supervisor_casework_status', methods: ['POST'])]
+    public function changestatus(CaseWork $casework, Request $request, EntityManagerInterface $entityManager, \App\Service\AuditService $auditService): Response
+    {
+        /** @var Supervisor $supervisor */
+        $supervisor = $this->getUser();
+
+        if ($casework->getCreatedBy() !== $supervisor) {
+            throw $this->createAccessDeniedException('You are not authorized to change the status of this case.');
+        }
+
+        $oldstatus = $casework->getstatus();
+        $newstatus = $request->request->get('status');
+        $validstatuses = ['open', 'closed', 'archived'];
+
+        if (in_array($newstatus, $validstatuses)) {
+            $casework->setstatus($newstatus);
+            $casework->setUpdatedAt(new \DateTimeImmutable());
+            $entityManager->flush();
+
+            // Log case status change
+            $auditService->logCasestatusChange($supervisor, $casework->gettitle(), $oldstatus, $newstatus);
+
+            $this->addFlash('success', sprintf('Case status updated to %s.', $newstatus));
+        } else {
+            $this->addFlash('error', 'Invalid status provided.');
+        }
+
+        return $this->redirectToRoute('app_supervisor_casework_show', ['id' => $casework->getId()]);
+    }
+
+    #[Route('/supervisor/casework/{id}/explore', name: 'app_supervisor_casework_explore', methods: ['GET'])]
+    public function exploreCase(CaseWork $casework): Response
+    {
+        /** @var Supervisor $supervisor */
+        $supervisor = $this->getUser();
+        
+        if ($casework->getCreatedBy() !== $supervisor) {
+            throw $this->createAccessDeniedException('You are not authorized to view this case.');
+        }
+
+        return $this->render('supervisor/casework/explore.html.twig', [
+            'casework' => $casework,
+        ]);
+    }
+
+    #[Route('/supervisor/evidence/{id}/verify', name: 'app_supervisor_evidence_verify', methods: ['POST'])]
+    public function verifyIntegrity(Evidence $evidence, EntityManagerInterface $entityManager, \App\Service\AuditService $auditService): JsonResponse
+    {
+        /** @var Supervisor $supervisor */
+        $supervisor = $this->getUser();
+        
+        $casework = $evidence->getCaseWork();
+        if ($casework?->getCreatedBy() !== $supervisor) {
+             return new JsonResponse(['status' => 'error', 'message' => 'Access denied.'], 403);
+        }
+
+        $destination = $this->getParameter('evidence_directory');
+        $filePath = $destination . '/' . $evidence->getStoredFilename();
+
+        if (!file_exists($filePath)) {
+            return new JsonResponse(['status' => 'error', 'message' => 'File not found on server.'], 404);
+        }
+
+        $currentHash = hash_file('sha256', $filePath);
+        $storedHash = $evidence->getFileHash();
+
+        if ($currentHash === $storedHash) {
+            $status = 'verified';
+            $message = 'Integrity verified by Supervisor. File is unchanged.';
+        } else {
+            $status = 'tampered';
+            $message = 'TAMPERED! Current hash does not match stored hash. Flagged by Supervisor.';
+        }
+
+        // Log this check in the Chain of Custody for forensics
+        $chainEntry = new ChainOfCustody();
+        $chainEntry->setAction('Supervisor Integrity Verification');
+        $chainEntry->setDescription(sprintf('Verification performed by Supervisor. status: %s. Message: %s', strtoupper($status), $message));
+        $chainEntry->setDateUpdate(new \DateTime());
+        $chainEntry->setNewHash($currentHash);
+        $chainEntry->setPreviosHash($storedHash);
+        $chainEntry->setEvidence($evidence);
+        $chainEntry->setUser($supervisor);
+
+        $entityManager->persist($chainEntry);
+        $entityManager->flush();
+
+        // Log to audit system
+        if ($status === 'tampered') {
+            $auditService->logTamperedAlert($supervisor, $evidence, [
+                'current_hash' => $currentHash,
+                'stored_hash' => $storedHash
+            ]);
+        } else {
+            $auditService->logIntegrityCheck($supervisor, $evidence, $status, [
+                'hash' => $currentHash
+            ]);
+        }
+
+        if ($status === 'verified') {
+            return new JsonResponse([
+                'status' => 'verified',
+                'message' => $message,
+                'hash' => $currentHash
+            ]);
+        } else {
+            return new JsonResponse([
+                'status' => 'tampered',
+                'message' => $message,
+                'current_hash' => $currentHash,
+                'stored_hash' => $storedHash
+            ]);
+        }
+    }
+
+    #[Route('/supervisor/casework/{id}/report', name: 'app_supervisor_casework_report', methods: ['GET'])]
+    public function generateReport(CaseWork $casework): Response
+    {
+        /** @var Supervisor $supervisor */
+        $supervisor = $this->getUser();
+        
+        if ($casework->getCreatedBy() !== $supervisor) {
+            throw $this->createAccessDeniedException('You are not authorized to view this case.');
+        }
+
+        return $this->render('supervisor/casework/report.html.twig', [
+            'casework' => $casework,
+            'generatedAt' => new \DateTime(),
+        ]);
+    }
 }

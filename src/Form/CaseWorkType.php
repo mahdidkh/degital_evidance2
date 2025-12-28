@@ -14,9 +14,9 @@ class CaseWorkType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('tittel')
-            ->add('statu')
-            ->add('discription')
+            ->add('title')
+            ->add('status')
+            ->add('description')
             ->add('investigateurs', EntityType::class, [
                 'class' => Investigateur::class,
                 'choice_label' => 'id',

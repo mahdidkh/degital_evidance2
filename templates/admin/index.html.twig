@@ -1,12 +1,257 @@
-{% extends 'base.html.twig' %}
+{% extends 'admin/layout.html.twig' %}
 
-{% block title %}Hello AdminController!
+{% block title %}Admin Oversight Dashboard
 {% endblock %}
 
-{% block body %}
-	{% include 'componant/sidebar.html.twig' %}
+{% block stylesheets %}
+	{{ parent() }}
+	<style>
+		/* KPI Grid */
+		.stats-grid {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+			gap: 1.5rem;
+			margin-bottom: 3rem;
+		}
 
-	<main style="margin-left: 280px; padding: 20px; width: calc(100% - 280px);">
-		{% block content %}{% endblock %}
-	</main>
+		.stat-card {
+			background: var(--card-bg);
+			backdrop-filter: blur(16px);
+			border: 1px solid var(--border-glass);
+			border-radius: 24px;
+			padding: 1.5rem;
+			display: flex;
+			align-items: center;
+			gap: 1.25rem;
+			transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+			position: relative;
+			overflow: hidden;
+		}
+
+		.stat-card:hover {
+			transform: translateY(-5px);
+			border-color: var(--accent-blue);
+			box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
+		}
+
+		.stat-card::after {
+			content: '';
+			position: absolute;
+			top: -50%;
+			left: -50%;
+			width: 200%;
+			height: 200%;
+			background: radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, transparent 70%);
+			opacity: 0;
+			transition: opacity 0.3s;
+		}
+
+		.stat-card:hover::after {
+			opacity: 1;
+		}
+
+		.stat-icon {
+			width: 56px;
+			height: 56px;
+			border-radius: 16px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			font-size: 1.5rem;
+			flex-shrink: 0;
+		}
+
+		.stat-info {
+			display: flex;
+			flex-direction: column;
+		}
+
+		.stat-value {
+			font-size: 1.75rem;
+			font-weight: 800;
+			color: white;
+		}
+
+		.stat-label {
+			font-size: 0.875rem;
+			color: var(--text-secondary);
+			font-weight: 600;
+			text-transform: uppercase;
+			letter-spacing: 0.05em;
+		}
+
+		/* Activities Feed */
+		.activity-panel {
+			background: var(--card-bg);
+			backdrop-filter: blur(16px);
+			border: 1px solid var(--border-glass);
+			border-radius: 28px;
+			padding: 2rem;
+		}
+
+		.activity-list {
+			display: flex;
+			flex-direction: column;
+			gap: 1.25rem;
+		}
+
+		.activity-item {
+			display: flex;
+			align-items: flex-start;
+			gap: 1rem;
+			padding: 1rem;
+			background: rgba(15, 23, 42, 0.4);
+			border-radius: 16px;
+			border: 1px solid transparent;
+			transition: all 0.2s;
+		}
+
+		.activity-item:hover {
+			border-color: var(--border-glass);
+			background: rgba(15, 23, 42, 0.6);
+		}
+
+		.activity-avatar {
+			width: 40px;
+			height: 40px;
+			background: var(--accent-blue);
+			color: white;
+			border-radius: 12px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			font-weight: 700;
+			flex-shrink: 0;
+		}
+
+		.activity-content {
+			flex: 1;
+		}
+
+		.activity-meta {
+			display: flex;
+			justify-content: space-between;
+			margin-bottom: 0.25rem;
+		}
+
+		.activity-user {
+			font-weight: 700;
+			font-size: 0.9rem;
+		}
+
+		.activity-time {
+			font-size: 0.75rem;
+			color: var(--text-secondary);
+		}
+
+		.activity-action {
+			font-size: 0.85rem;
+			color: var(--text-primary);
+		}
+
+		.activity-desc {
+			font-size: 0.8rem;
+			color: var(--text-secondary);
+			margin-top: 0.25rem;
+		}
+
+		.chart-header {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			margin-bottom: 2rem;
+		}
+
+		.chart-title {
+			font-size: 1.25rem;
+			font-weight: 700;
+			display: flex;
+			align-items: center;
+			gap: 0.75rem;
+		}
+	</style>
+{% endblock %}
+
+{% block admin_content %}
+	<header class="page-header">
+		<div>
+			<h1 class="page-title">Forensic Management Oversight</h1>
+			<p style="color: var(--text-secondary); font-weight: 500;">System performance and audit analytics</p>
+		</div>
+	</header>
+
+	<!-- KPI Cards -->
+	<section class="stats-grid">
+		<div class="stat-card">
+			<div class="stat-icon" style="background: rgba(59, 130, 246, 0.1); color: var(--accent-blue);">
+				<span class="material-symbols-outlined">folder</span>
+			</div>
+			<div class="stat-info">
+				<span class="stat-value">{{ stats.total_cases }}</span>
+				<span class="stat-label">Total Cases</span>
+			</div>
+		</div>
+
+		<div class="stat-card">
+			<div class="stat-icon" style="background: rgba(139, 92, 246, 0.1); color: var(--accent-purple);">
+				<span class="material-symbols-outlined">fingerprint</span>
+			</div>
+			<div class="stat-info">
+				<span class="stat-value">{{ stats.total_evidence }}</span>
+				<span class="stat-label">Evidence Items</span>
+			</div>
+		</div>
+
+		<div class="stat-card">
+			<div class="stat-icon" style="background: rgba(16, 185, 129, 0.1); color: var(--accent-emerald);">
+				<span class="material-symbols-outlined">group</span>
+			</div>
+			<div class="stat-info">
+				<span class="stat-value">{{ stats.active_users }}</span>
+				<span class="stat-label">Active Users</span>
+			</div>
+		</div>
+
+		<div class="stat-card">
+			<div class="stat-icon" style="background: rgba(245, 158, 11, 0.1); color: var(--accent-amber);">
+				<span class="material-symbols-outlined">storage</span>
+			</div>
+			<div class="stat-info">
+				<span class="stat-value" id="storageValue">{{ stats.storage_usage }}</span>
+				<span class="stat-label">Storage Usage</span>
+			</div>
+		</div>
+	</section>
+
+	<!-- Activity Feed -->
+	<section class="activity-panel">
+		<div class="chart-header">
+			<h2 class="chart-title">
+				<span class="material-symbols-outlined" style="color: var(--accent-amber);">history</span>
+				Recent Global Forensics Activity
+			</h2>
+		</div>
+		<div class="activity-list">
+			{% for activity in stats.recent_activities %}
+				<div class="activity-item">
+					<div class="activity-avatar">
+						{{ activity.user ? activity.user.email|slice(0, 1)|upper : 'S' }}
+					</div>
+					<div class="activity-content">
+						<div class="activity-meta">
+							<span class="activity-user">{{ activity.user ? activity.user.email : 'System' }}</span>
+							<span class="activity-time">{{ activity.dateUpdate|date('M d, H:i') }}</span>
+						</div>
+						<div class="activity-action">
+							<strong>{{ activity.action }}</strong>
+							on evidence #{{ activity.evidence.id }}
+						</div>
+						<p class="activity-desc">{{ activity.description }}</p>
+					</div>
+				</div>
+			{% else %}
+				<p style="text-align: center; color: var(--text-secondary);">No recent forensic activity logged.</p>
+			{% endfor %}
+		</div>
+	</section>
 {% endblock %}

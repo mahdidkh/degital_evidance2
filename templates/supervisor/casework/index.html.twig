@@ -201,7 +201,7 @@
 		color: var(--text-secondary);
 	}
 </style>{% endblock %}{% block body %}
-{% include 'componant/sidebar.html.twig' %}
+{% include 'componant/sidebar_supervisor.html.twig' %}
 
 <div class="casework-container">
 	<a href="{{ path('app_supervisor_index') }}" class="btn-back">
@@ -234,19 +234,19 @@
 				<div class="case-card" onclick="window.location='{{ path('app_supervisor_casework_show', {'id': casework.id}) }}'">
 					<div class="case-header">
 						<div style="flex: 1;">
-							<h3 class="case-title">{{ casework.tittel }}</h3>
+							<h3 class="case-title">{{ casework.title }}</h3>
 							<div style="display: flex; gap: 0.5rem;">
 								<span class="priority-badge priority-{{ casework.priority }}">
 									{{ casework.priority }}
 								</span>
-								<span class="status-badge status-{{ casework.statu }}">
-									{{ casework.statu|replace({'_': ' '}) }}
+								<span class="status-badge status-{{ casework.status }}">
+									{{ casework.status|replace({'_': ' '}) }}
 								</span>
 							</div>
 						</div>
 					</div>
 
-					<p class="case-description">{{ casework.discription }}</p>
+					<p class="case-description">{{ casework.description }}</p>
 
 					<div class="case-meta">
 						<div class="meta-item">

@@ -18,22 +18,22 @@ class CaseWork
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $tittel = null;
+    private ?string $title = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $statu = null;
+    private ?string $status = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $discription = null;
+    private ?string $description = null;
 
     #[ORM\ManyToMany(targetEntity: Investigateur::class, mappedBy: 'caseWorks')]
     private Collection $investigateurs;
 
     /**
-     * @var Collection<int, Evidance>
+     * @var Collection<int, Evidence>
      */
-    #[ORM\OneToMany(targetEntity: Evidance::class, mappedBy: 'caseWork')]
-    private Collection $evidances;
+    #[ORM\OneToMany(targetEntity: Evidence::class, mappedBy: 'caseWork')]
+    private Collection $evidences;
 
     #[ORM\ManyToOne(inversedBy: 'caseWorks')]
     private ?Team $assignedTeam = null;
@@ -54,7 +54,7 @@ class CaseWork
     public function __construct()
     {
         $this->investigateurs = new ArrayCollection();
-        $this->evidances = new ArrayCollection();
+        $this->evidences = new ArrayCollection();
         $this->createdAt = new \DateTimeImmutable();
     }
 
@@ -70,38 +70,38 @@ class CaseWork
         return $this;
     }
 
-    public function getTittel(): ?string
+    public function getTitle(): ?string
     {
-        return $this->tittel;
+        return $this->title;
     }
 
-    public function setTittel(string $tittel): static
+    public function setTitle(string $title): static
     {
-        $this->tittel = $tittel;
+        $this->title = $title;
 
         return $this;
     }
 
-    public function getStatu(): ?string
+    public function getStatus(): ?string
     {
-        return $this->statu;
+        return $this->status;
     }
 
-    public function setStatu(string $statu): static
+    public function setStatus(string $status): static
     {
-        $this->statu = $statu;
+        $this->status = $status;
 
         return $this;
     }
 
-    public function getDiscription(): ?string
+    public function getDescription(): ?string
     {
-        return $this->discription;
+        return $this->description;
     }
 
-    public function setDiscription(string $discription): static
+    public function setDescription(string $description): static
     {
-        $this->discription = $discription;
+        $this->description = $description;
 
         return $this;
     }
@@ -131,29 +131,29 @@ class CaseWork
     }
 
     /**
-     * @return Collection<int, Evidance>
+     * @return Collection<int, Evidence>
      */
-    public function getEvidances(): Collection
+    public function getEvidences(): Collection
     {
-        return $this->evidances;
+        return $this->evidences;
     }
 
-    public function addEvidance(Evidance $evidance): static
+    public function addEvidence(Evidence $evidence): static
     {
-        if (!$this->evidances->contains($evidance)) {
-            $this->evidances->add($evidance);
-            $evidance->setCaseWork($this);
+        if (!$this->evidences->contains($evidence)) {
+            $this->evidences->add($evidence);
+            $evidence->setCaseWork($this);
         }
 
         return $this;
     }
 
-    public function removeEvidance(Evidance $evidance): static
+    public function removeEvidence(Evidence $evidence): static
     {
-        if ($this->evidances->removeElement($evidance)) {
+        if ($this->evidences->removeElement($evidence)) {
             // set the owning side to null (unless already changed)
-            if ($evidance->getCaseWork() === $this) {
-                $evidance->setCaseWork(null);
+            if ($evidence->getCaseWork() === $this) {
+                $evidence->setCaseWork(null);
             }
         }
 

@@ -1,0 +1,101 @@
+{% extends 'admin/layout.html.twig' %}
+
+{% block title %}Edit User:
+	{{ user.firstName }}
+	{{ user.lastName }}
+{% endblock %}
+
+{% block admin_content %}
+	<header class="page-header">
+		<div>
+			<h1 class="page-title">Edit Team Member</h1>
+			<p style="color: var(--text-secondary); font-weight: 500;">Update profile information for
+				{{ user.email }}</p>
+		</div>
+		<a href="{{ path('app_admin_users') }}" class="btn" style="background: rgba(255, 255, 255, 0.05); color: var(--text-secondary); padding: 0.75rem 1.5rem; border-radius: 14px; text-decoration: none; font-weight: 700; display: flex; align-items: center; gap: 0.5rem; border: 1px solid var(--border-glass);">
+			<span class="material-symbols-outlined">arrow_back</span>
+			Back to List
+		</a>
+	</header>
+
+	<div style="max-width: 900px; margin: 0 auto;">
+		<div style="background: var(--card-bg); backdrop-filter: blur(16px); border: 1px solid var(--border-glass); padding: 3rem; border-radius: 28px; box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);">
+			<div style="display: flex; align-items: center; gap: 1.5rem; margin-bottom: 3rem; padding-bottom: 2rem; border-bottom: 1px solid var(--border-glass);">
+				<div style="width: 70px; height: 70px; border-radius: 20px; background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple)); display: flex; align-items: center; justify-content: center; font-size: 1.75rem; font-weight: 800; color: white;">
+					{{ user.firstName|slice(0,1) }}{{ user.lastName|slice(0,1) }}
+				</div>
+				<div>
+					<h2 style="margin: 0; font-size: 1.5rem; color: white;">{{ user.firstName }}
+						{{ user.lastName }}</h2>
+					<span style="color: var(--text-secondary); font-weight: 600; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 0.1em;">
+						{{ user.role|replace({'ROLE_': ''}) }}
+					</span>
+				</div>
+			</div>
+
+			{{ form_start(form, {'attr': {'class': 'auth-form'}}) }}
+
+			<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+				<div class="form-group" style="margin-bottom: 1.5rem;">
+					{{ form_label(form.firstName, null, {'label_attr': {'class': 'form-label', 'style': 'color: var(--text-primary); margin-bottom: 0.5rem; display: block;'}}) }}
+					{{ form_widget(form.firstName, {'attr': {'class': 'form-input', 'style': 'background: rgba(15, 23, 42, 0.6); color: white; border: 1px solid var(--border-glass); padding: 0.75rem 1rem; border-radius: 12px; width: 100%;'}}) }}
+					{{ form_errors(form.firstName) }}
+				</div>
+
+				<div class="form-group" style="margin-bottom: 1.5rem;">
+					{{ form_label(form.lastName, null, {'label_attr': {'class': 'form-label', 'style': 'color: var(--text-primary); margin-bottom: 0.5rem; display: block;'}}) }}
+					{{ form_widget(form.lastName, {'attr': {'class': 'form-input', 'style': 'background: rgba(15, 23, 42, 0.6); color: white; border: 1px solid var(--border-glass); padding: 0.75rem 1rem; border-radius: 12px; width: 100%;'}}) }}
+					{{ form_errors(form.lastName) }}
+				</div>
+			</div>
+
+			<div class="form-group" style="margin-bottom: 1.5rem;">
+				{{ form_label(form.email, null, {'label_attr': {'class': 'form-label', 'style': 'color: var(--text-primary); margin-bottom: 0.5rem; display: block;'}}) }}
+				{{ form_widget(form.email, {'attr': {'class': 'form-input', 'style': 'background: rgba(15, 23, 42, 0.6); color: white; border: 1px solid var(--border-glass); padding: 0.75rem 1rem; border-radius: 12px; width: 100%;'}}) }}
+				{{ form_errors(form.email) }}
+			</div>
+
+			<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+				<div class="form-group" style="margin-bottom: 1.5rem;">
+					{{ form_label(form.tel, null, {'label_attr': {'class': 'form-label', 'style': 'color: var(--text-primary); margin-bottom: 0.5rem; display: block;'}}) }}
+					{{ form_widget(form.tel, {'attr': {'class': 'form-input', 'style': 'background: rgba(15, 23, 42, 0.6); color: white; border: 1px solid var(--border-glass); padding: 0.75rem 1rem; border-radius: 12px; width: 100%;'}}) }}
+					{{ form_errors(form.tel) }}
+				</div>
+
+				<div class="form-group" style="margin-bottom: 1.5rem;">
+					{{ form_label(form.cin, null, {'label_attr': {'class': 'form-label', 'style': 'color: var(--text-primary); margin-bottom: 0.5rem; display: block;'}}) }}
+					{{ form_widget(form.cin, {'attr': {'class': 'form-input', 'style': 'background: rgba(15, 23, 42, 0.6); color: white; border: 1px solid var(--border-glass); padding: 0.75rem 1rem; border-radius: 12px; width: 100%;'}}) }}
+					{{ form_errors(form.cin) }}
+				</div>
+			</div>
+
+			<div class="form-group" style="margin-top: 1rem; margin-bottom: 2rem; display: flex; align-items: center; gap: 0.75rem; background: rgba(255, 255, 255, 0.02); padding: 1rem; border-radius: 16px; border: 1px solid var(--border-glass);">
+				{{ form_widget(form.isActive, {'attr': {'style': 'width: 20px; height: 20px; cursor: pointer;'}}) }}
+				{{ form_label(form.isActive, null, {'label_attr': {'style': 'color: var(--text-primary); cursor: pointer; font-weight: 600;'}}) }}
+				{{ form_errors(form.isActive) }}
+			</div>
+
+			<div style="display: flex; justify-content: flex-end; gap: 1rem;">
+				<a href="{{ path('app_admin_users') }}" style="padding: 1rem 2rem; border-radius: 14px; text-decoration: none; font-weight: 700; color: var(--text-secondary); background: rgba(255, 255, 255, 0.05);">Cancel</a>
+				<button type="submit" style="background: var(--accent-blue); color: white; border: none; padding: 1rem 2rem; border-radius: 14px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; transition: all 0.2s;">
+					<span class="material-symbols-outlined">save</span>
+					Save Changes
+				</button>
+			</div>
+
+			{{ form_end(form) }}
+		</div>
+	</div>
+
+	<style>
+		button:hover {
+			transform: scale(1.02);
+			filter: brightness(1.1);
+		}
+		.form-input:focus {
+			outline: none;
+			border-color: var(--accent-blue) !important;
+			background: rgba(59, 130, 246, 0.05) !important;
+		}
+	</style>
+{% endblock %}

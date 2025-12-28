@@ -1,0 +1,257 @@
+{% set current_route = app.request.attributes.get('_route') %}
+
+<style>
+/* Sidebar Styles */:root
+{
+	--sidebar-bg: #0f1623;
+	--sidebar-hover: #1f2937;
+	--sidebar-active: #1c3452;
+	--sidebar-text: #9ca3af;
+	--sidebar-text-active: #3b82f6;
+	--sidebar-border: #1f2937;
+	--sidebar-width: 280px;
+}
+
+.sidebar {
+	width: var(--sidebar-width);
+	height: 100vh;
+	background-color: var(--sidebar-bg);
+	color: var(--sidebar-text);
+	display: flex;
+	flex-direction: column;
+	position: fixed;
+	top: 0;
+	left: 0;
+	border-right: 1px solid var(--sidebar-border);
+	z-index: 1000;
+	font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+.sidebar-header {
+	padding: 1.5rem;
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+	border-bottom: 1px solid var(--sidebar-border);
+}
+
+.logo-icon {
+	width: 2rem;
+	height: 2rem;
+	color: #3b82f6;
+	background: rgba(59, 130, 246, 0.1);
+	padding: 6px;
+	border-radius: 6px;
+}
+
+.brand-name {
+	font-size: 1.125rem;
+	font-weight: 700;
+	color: #fff;
+	letter-spacing: -0.025em;
+}
+
+.sidebar-menu {
+	flex: 1;
+	padding: 1.5rem 1rem;
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+	overflow-y: auto;
+}
+
+.menu-item {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+	padding: 0.75rem 1rem;
+	border-radius: 0.5rem;
+	text-decoration: none;
+	color: var(--sidebar-text);
+	transition: all 0.2s ease;
+	font-weight: 500;
+	font-size: 0.95rem;
+}
+
+.menu-item:hover {
+	color: #fff;
+	background-color: var(--sidebar-hover);
+}
+
+.menu-item.active {
+	background-color: var(--sidebar-active);
+	color: var(--sidebar-text-active);
+}
+
+.menu-item .icon {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.menu-item svg {
+	width: 1.5rem;
+	height: 1.5rem;
+}
+
+.sidebar-footer {
+	padding: 1rem;
+	border-top: 1px solid var(--sidebar-border);
+}
+
+.user-profile {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+	padding: 0.5rem;
+	border-radius: 0.5rem;
+	cursor: pointer;
+	transition: background-color 0.2s;
+}
+
+.user-profile:hover {
+	background-color: var(--sidebar-hover);
+}
+
+.user-avatar {
+	width: 2.5rem;
+	height: 2.5rem;
+	background-color: #374151;
+	border-radius: 9999px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	overflow: hidden;
+	color: #9ca3af;
+}
+
+.avatar-icon {
+	width: 100%;
+	height: 100%;
+}
+
+.user-info {
+	display: flex;
+	flex-direction: column;
+}
+
+.user-name {
+	font-size: 0.875rem;
+	font-weight: 600;
+	color: #fff;
+}
+
+.user-role {
+	font-size: 0.75rem;
+	color: #6b7280;
+}
+
+.sidebar-menu::-webkit-scrollbar {
+	width: 4px;
+}
+
+.sidebar-menu::-webkit-scrollbar-track {
+	background: transparent;
+}
+
+.sidebar-menu::-webkit-scrollbar-thumb {
+	background: #374151;
+	border-radius: 2px;
+}
+
+.sidebar-menu::-webkit-scrollbar-thumb:hover {
+	background: #4b5563;
+}
+
+.sidebar-footer-content {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 0.5rem;
+}
+
+.logout-btn {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 0.5rem;
+	border-radius: 0.5rem;
+	color: var(--sidebar-text);
+	transition: all 0.2s;
+	text-decoration: none;
+}
+
+.logout-btn:hover {
+	background-color: var(--sidebar-hover);
+	color: #ef4444;
+}
+
+.logout-btn svg {
+	width: 1.25rem;
+	height: 1.25rem;
+}</style><div class="sidebar">
+<div class="sidebar-header">
+	<div class="logo">
+		<svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 24 24" fill="currentColor" class="logo-icon">
+			<path fill-rule="evenodd" d="M12.516 2.17a.75.75 0 00-1.032 0 11.209 11.209 0 01-7.877 3.08.75.75 0 00-.722.515A12.74 12.74 0 002.25 9.75c0 5.942 4.064 10.933 9.563 12.348a.749.749 0 00.374 0c5.499-1.415 9.563-6.406 9.563-12.348 0-1.352-.172-2.67-.493-3.92a.75.75 0 00-.608-.565A11.21 11.21 0 0112.516 2.17zM12 4.195a9.715 9.715 0 006.331 2.376c.15.908.232 1.84.232 2.793 0 4.67-3.003 8.784-7.234 10.297l-.022.006-.022-.006c-4.231-1.513-7.234-5.627-7.234-10.297 0-.953.082-1.885.232-2.793A9.715 9.715 0 0012 4.195z" clip-rule="evenodd"/>
+		</svg>
+	</div>
+	<span class="brand-name">Digital Evidence</span>
+</div>
+
+<nav class="sidebar-menu">
+	<a href="{{ path('app_supervisor_index') }}" class="menu-item {% if current_route == 'app_supervisor_index' %}active{% endif %}">
+		<span class="icon">
+			<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewbox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+				<path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z"/>
+			</svg>
+		</span>
+		<span class="text">Dashboard</span>
+	</a>
+
+	<a href="{{ path('app_supervisor_casework_index') }}" class="menu-item {% if current_route starts with 'app_supervisor_casework' %}active{% endif %}">
+		<span class="icon">
+			<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewbox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+				<path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12.75V12A2.25 2.25 0 014.5 9.75h15A2.25 2.25 0 0121.75 12v.75m-8.69-6.44l-2.12-2.12a1.5 1.5 0 00-1.061-.44H4.5A2.25 2.25 0 002.25 6v12a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9a2.25 2.25 0 00-2.25-2.25h-5.379a1.5 1.5 0 01-1.06-.44z"/>
+			</svg>
+		</span>
+		<span class="text">Cases</span>
+	</a>
+
+	<a href="{{ path('app_supervisor_archive_index') }}" class="menu-item {% if current_route == 'app_supervisor_archive_index' %}active{% endif %}">
+		<span class="icon">
+			<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewbox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+				<path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z"/>
+			</svg>
+		</span>
+		<span class="text">Archives</span>
+	</a>
+</nav>
+
+<div class="sidebar-footer">
+	<div class="sidebar-footer-content">
+		<div class="user-profile">
+			<div class="user-avatar">
+				<svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 24 24" fill="currentColor" class="avatar-icon">
+					<path fill-rule="evenodd" d="M18.685 19.097A9.723 9.723 0 0021.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 003.065 7.097A9.716 9.716 0 0012 21.75a9.716 9.716 0 006.685-2.653zm-12.54-1.285A7.486 7.486 0 0112 15a7.486 7.486 0 015.855 2.812A8.224 8.224 0 0112 20.25a8.224 8.224 0 01-5.855-2.438zM15.75 9a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" clip-rule="evenodd"/>
+				</svg>
+			</div>
+			<div class="user-info">
+				{% if app.user %}
+					<span class="user-name">{{ app.user.firstName }}
+						{{ app.user.lastName }}</span>
+					<span class="user-role">Supervisor</span>
+				{% else %}
+					<span class="user-name">Guest</span>
+					<span class="user-role">Visitor</span>
+				{% endif %}
+			</div>
+		</div>
+
+		<a href="{{ path('app_logout') }}" class="logout-btn" title="Logout">
+			<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewbox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+				<path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75"/>
+			</svg>
+		</a>
+	</div>
+</div></div>

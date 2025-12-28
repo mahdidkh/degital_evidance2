@@ -1,7 +1,7 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}Explore:
-	{{ casework.tittel }}
+	{{ casework.title }}
 {% endblock %}
 
 {% block stylesheets %}
@@ -245,10 +245,28 @@
 		font-size: 0.9rem;
 	}
 
+	.event-user {
+		font-size: 0.8rem;
+		color: var(--accent-blue);
+		font-weight: 500;
+		margin-top: 0.1rem;
+	}
+
 	.event-desc {
 		font-size: 0.8rem;
 		color: var(--text-secondary);
 		margin-top: 0.25rem;
+	}
+
+	.uploader-tag {
+		font-size: 0.75rem;
+		color: var(--accent-blue);
+		opacity: 0.8;
+		display: flex;
+		align-items: center;
+		gap: 0.4rem;
+		margin-top: 0.5rem;
+		font-weight: 500;
 	}
 
 	.empty-state {
@@ -256,8 +274,106 @@
 		padding: 3rem;
 		color: var(--text-secondary);
 	}
+
+	.empty-state p {
+		color: var(--text-secondary);
+		margin-top: 1rem;
+	}
+
+	.readonly-banner {
+		grid-column: 1 / -1;
+		background: rgba(245, 158, 11, 0.1);
+		border: 1px solid rgba(245, 158, 11, 0.3);
+		border-radius: 12px;
+		padding: 0.75rem 1.5rem;
+		color: #f59e0b;
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		margin-bottom: 1.5rem;
+		font-weight: 600;
+		font-size: 0.9rem;
+	}
+
+	.btn-verify {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
+		padding: 0.4rem 1rem;
+		background: rgba(59, 130, 246, 0.1);
+		border: 1px solid rgba(59, 130, 246, 0.3);
+		border-radius: 8px;
+		color: var(--accent-blue);
+		font-size: 0.75rem;
+		font-weight: 600;
+		cursor: pointer;
+		transition: all 0.2s;
+	}
+
+	.btn-verify:hover {
+		background: rgba(59, 130, 246, 0.2);
+		transform: translateY(-1px);
+	}
+
+	.btn-verify.loading {
+		opacity: 0.7;
+		pointer-events: none;
+	}
+
+	.integrity-status {
+		font-size: 0.75rem;
+		display: flex;
+		align-items: center;
+		gap: 0.25rem;
+		font-weight: 600;
+	}
+
+	.status-verified {
+		color: #10b981;
+	}
+	.status-tampered {
+		color: #ef4444;
+	}
+	.status-error {
+		color: #f59e0b;
+	}
+
+	@keyframes spin {
+		from {
+			transform: rotate(0deg);
+		}
+		to {
+			transform: rotate(360deg);
+		}
+	}
+
+	.spin {
+		animation: spin 1s linear infinite;
+	}
+
+	.btn-add-evidence {
+		margin-left: auto;
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
+		padding: 0.5rem 1rem;
+		background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+		color: white;
+		text-decoration: none;
+		border-radius: 12px;
+		font-weight: 600;
+		font-size: 0.9rem;
+		transition: all 0.3s ease;
+		box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+		border: 1px solid rgba(255, 255, 255, 0.1);
+	}
+	.btn-add-evidence:hover {
+		transform: translateY(-2px);
+		box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+		filter: brightness(1.1);
+	}
 </style>{% endblock %}{% block body %}
-{% include 'componant/sidebar.html.twig' %}
+{% include 'componant/sidebar_investigateur.html.twig' %}
 
 <div class="explore-container">
 	<header class="nav-header">
@@ -271,6 +387,14 @@
 		<div class="case-id">#{{ casework.id }}</div>
 	</header>
 
+	{% if casework.status != 'open' %}
+		<div class="readonly-banner">
+			<span class="material-symbols-outlined">lock</span>
+			READ-ONLY MODE: This case is
+			{{ casework.status|upper }}. No new evidence or modifications are permitted.
+		</div>
+	{% endif %}
+
 	<div
 		class="dashboard-grid">
 		<!-- Main Content: Evidence -->
@@ -278,10 +402,16 @@
 			<div class="section-header">
 				<span class="material-symbols-outlined" style="color: var(--accent-blue)">fingerprint</span>
 				<h2>Dossier Evidence</h2>
+				{% if casework.status == 'open' %}
+					<a href="{{ path('app_evidence_new', {'case_id': casework.id}) }}" class="btn-add-evidence">
+						<span class="material-symbols-outlined" style="font-size: 1.1rem;">add_circle</span>
+						Add Evidence
+					</a>
+				{% endif %}
 			</div>
 
 			<div class="evidence-list">
-				{% for evidence in casework.evidances %}
+				{% for evidence in casework.evidences %}
 					<div class="evidence-item">
 						{% set isImage = false %}
 						{% if evidence.storedFilename %}
@@ -293,7 +423,7 @@
 
 						{% if isImage %}
 							<div class="evidence-preview">
-								<img src="{{ asset('uploads/evidances/' ~ evidence.storedFilename) }}" alt="{{ evidence.tittel }}">
+								<img src="{{ asset('uploads/evidence/' ~ evidence.storedFilename) }}" alt="{{ evidence.title }}">
 							</div>
 						{% else %}
 							<div class="evidence-icon">
@@ -302,8 +432,16 @@
 						{% endif %}
 
 						<div class="evidence-info" style="flex: 1;">
-							<h3>{{ evidence.tittel }}</h3>
-							<p>{{ evidence.discription }}</p>
+							<h3>{{ evidence.title }}</h3>
+							<p>{{ evidence.description }}</p>
+
+							{% if evidence.uploadedBy %}
+								<div class="uploader-tag">
+									<span class="material-symbols-outlined" style="font-size: 0.9rem;">upload_file</span>
+									Uploaded by:
+									{{ evidence.uploadedBy.email }}
+								</div>
+							{% endif %}
 
 							{% if evidence.remarque %}
 								<div class="remarque-box">
@@ -319,10 +457,15 @@
 								</p>
 
 								{% if evidence.storedFilename %}
-									<a href="{{ asset('uploads/evidances/' ~ evidence.storedFilename) }}" class="btn-download" target="_blank">
+									<a href="{{ asset('uploads/evidence/' ~ evidence.storedFilename) }}" class="btn-download" target="_blank">
 										<span class="material-symbols-outlined" style="font-size: 1rem;">download</span>
-										Download File
+										Download
 									</a>
+
+									<button class="btn-verify" onclick="verifyIntegrity({{ evidence.id }}, this)">
+										<span class="material-symbols-outlined" style="font-size: 1rem;">verified_user</span>
+										Verify Integrity
+									</button>
 								{% endif %}
 							</div>
 						</div>
@@ -345,7 +488,7 @@
 
 			<div class="timeline">
 				{% set entries = [] %}
-				{% for evidence in casework.evidances %}
+				{% for evidence in casework.evidences %}
 					{% for entry in evidence.chainEntries %}
 						{% set entries = entries|merge([entry]) %}
 					{% endfor %}
@@ -355,6 +498,12 @@
 					<div class="timeline-event">
 						<div class="event-time">{{ entry.dateUpdate|date('M d, Y') }}</div>
 						<div class="event-action">{{ entry.action }}</div>
+						{% if entry.user %}
+							<div class="event-user">
+								<span class="material-symbols-outlined" style="font-size: 0.9rem; vertical-align: middle;">person</span>
+								{{ entry.user.email }}
+							</div>
+						{% endif %}
 						<div class="event-desc">{{ entry.description }}</div>
 					</div>
 				{% else %}
@@ -365,4 +514,60 @@
 			</div>
 		</div>
 	</div>
-</div>{% endblock %}
+</div>{% endblock %}{% block javascripts %}
+{{ parent() }}
+<script>
+	async function verifyIntegrity(evidenceId, btn) {
+const originalContent = btn.innerHTML;
+btn.classList.add('loading');
+btn.innerHTML = '<span class="material-symbols-outlined spin" style="font-size: 1rem;">sync</span> Verifying...';
+
+try {
+const response = await fetch (`/investigateur/evidence/${evidenceId}/verify`, {
+method: 'POST',
+headers: {
+'X-Requested-With': 'XMLHttpRequest'
+}
+});
+
+const data = await response.json();
+const footer = btn.closest('.evidence-footer');
+
+// Remove existing status if any
+const existingstatus = footer.querySelector('.integrity-status');
+if (existingstatus) 
+existingstatus.remove();
+
+
+
+const statusEl = document.createElement('div');
+statusEl.className = `integrity-status status-${
+data.status
+}`;
+
+if (data.status === 'verified') {
+statusEl.innerHTML = '<span class="material-symbols-outlined" style="font-size: 1rem;">check_circle</span> Verified';
+btn.style.borderColor = '#10b981';
+btn.style.color = '#10b981';
+} else if (data.status === 'tampered') {
+statusEl.innerHTML = '<span class="material-symbols-outlined" style="font-size: 1rem;">warning</span> TAMPERED';
+btn.style.borderColor = '#ef4444';
+btn.style.color = '#ef4444';
+} else {
+statusEl.innerHTML = '<span class="material-symbols-outlined" style="font-size: 1rem;">error</span> ' + (
+data.message || 'Error'
+);
+} footer.appendChild(statusEl);
+
+// Refresh the timeline after a short delay so the user can see the new log entry
+setTimeout(() => {
+window.location.reload();
+}, 1500);
+} catch (error) {
+console.error('Error verifying integrity:', error);
+} finally {
+btn.classList.remove('loading');
+btn.innerHTML = originalContent;
+}
+}
+</script>{% endblock %}

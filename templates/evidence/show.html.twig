@@ -1,0 +1,32 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Fichier Evidence
+{% endblock %}
+
+{% block body %}
+	<h1>Fichier</h1>
+
+	{% if evidence.storedFilename %}
+		{% set file = evidence.storedFilename %}
+		{% set fileUrl = asset('uploads/evidence/' ~ file) %}
+
+		{# Si PDF #}
+		{% if file ends with '.pdf' %}
+			<iframe src="{{ fileUrl }}" width="100%" height="700px"></iframe>
+
+			{# Si image #}
+		{% elseif file matches '/\.(jpg|jpeg|png|gif)$/i' %}
+			<img
+			src="{{ fileUrl }}" class="img-fluid" style="max-height: 90vh;">
+
+			{# Sinon on utilise Google Docs Viewer pour afficher #}
+		{% else %}
+			<iframe src="https://docs.google.com/gview?url={{ absolute_url(fileUrl) }}&embedded=true" style="width:100%; height:700px;" frameborder="0"></iframe>
+		{% endif %}
+	{% else %}
+		<p>
+			<em>Aucun fichier disponible</em>
+		</p>
+	{% endif %}
+
+{% endblock %}

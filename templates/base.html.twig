@@ -75,35 +75,34 @@
 				}
 			</style>
 		{% endblock %}
-
-		{% block javascripts %}
-			{% block importmap %}
-				{{ importmap('app') }}
-			{% endblock %}
-		{% endblock %}
 	</head>
-	<body>
-		<div class="flash-messages-container">
-			{% for label, messages in app.flashes %}
-				{% for message in messages %}
-					<div class="flash-message flash-{{ label }}">
-						<div class="flash-content">
-							{% if label == 'success' %}
-								<span class="material-symbols-outlined">check_circle</span>
-							{% elseif label == 'error' %}
-								<span class="material-symbols-outlined">error</span>
-							{% else %}
-								<span class="material-symbols-outlined">info</span>
-							{% endif %}
-							{{ message }}
-						</div>
-						<button type="button" class="flash-close" onclick="this.parentElement.remove()">
-							<span class="material-symbols-outlined">close</span>
-						</button>
+<body>
+	<div class="flash-messages-container">
+		{% for label, messages in app.flashes %}
+			{% for message in messages %}
+				<div class="flash-message flash-{{ label }}">
+					<div class="flash-content">
+						{% if label == 'success' %}
+							<span class="material-symbols-outlined">check_circle</span>
+						{% elseif label == 'error' %}
+							<span class="material-symbols-outlined">error</span>
+						{% else %}
+							<span class="material-symbols-outlined">info</span>
+						{% endif %}
+						{{ message }}
 					</div>
-				{% endfor %}
+					<button type="button" class="flash-close" onclick="this.parentElement.remove()">
+						<span class="material-symbols-outlined">close</span>
+					</button>
+				</div>
 			{% endfor %}
-		</div>
-		{% block body %}{% endblock %}
-	</body>
-</html>
+		{% endfor %}
+	</div>
+	{% block body %}{% endblock %}
+
+	{% block javascripts %}
+		{% block importmap %}
+			{{ importmap('app') }}
+		{% endblock %}
+	{% endblock %}
+</body></html>

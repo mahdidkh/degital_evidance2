@@ -1,0 +1,209 @@
+{% extends 'admin/layout.html.twig' %}
+
+{% block title %}User Management
+{% endblock %}
+
+{% block stylesheets %}
+	{{ parent() }}
+	<style>
+		.user-table-panel {
+			background: var(--card-bg);
+			backdrop-filter: blur(16px);
+			border: 1px solid var(--border-glass);
+			border-radius: 28px;
+			padding: 2rem;
+			overflow: hidden;
+		}
+
+		.user-table {
+			width: 100%;
+			border-collapse: collapse;
+			margin-top: 1rem;
+		}
+
+		.user-table th {
+			text-align: left;
+			padding: 1.25rem 1rem;
+			color: var(--text-secondary);
+			font-size: 0.85rem;
+			font-weight: 700;
+			text-transform: uppercase;
+			letter-spacing: 0.05em;
+			border-bottom: 1px solid var(--border-glass);
+		}
+
+		.user-table td {
+			padding: 1.25rem 1rem;
+			border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+			vertical-align: middle;
+		}
+
+		.user-row:hover {
+			background: rgba(255, 255, 255, 0.02);
+		}
+
+		.user-info-cell {
+			display: flex;
+			align-items: center;
+			gap: 1rem;
+		}
+
+		.user-initials {
+			width: 40px;
+			height: 40px;
+			border-radius: 12px;
+			background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			font-weight: 700;
+			color: white;
+			font-size: 0.9rem;
+		}
+
+		.user-name-text {
+			display: flex;
+			flex-direction: column;
+		}
+
+		.user-full-name {
+			font-weight: 700;
+			color: white;
+		}
+
+		.user-email-text {
+			font-size: 0.85rem;
+			color: var(--text-secondary);
+		}
+
+		.role-badge {
+			padding: 6px 12px;
+			border-radius: 10px;
+			font-size: 0.75rem;
+			font-weight: 800;
+			text-transform: uppercase;
+		}
+
+		.role-supervisor {
+			background: rgba(139, 92, 246, 0.1);
+			color: var(--accent-purple);
+			border: 1px solid rgba(139, 92, 246, 0.2);
+		}
+
+		.role-investigator {
+			background: rgba(59, 130, 246, 0.1);
+			color: var(--accent-blue);
+			border: 1px solid rgba(59, 130, 246, 0.2);
+		}
+
+		.status-indicator {
+			display: flex;
+			align-items: center;
+			gap: 0.5rem;
+			font-size: 0.85rem;
+			font-weight: 600;
+		}
+
+		.status-dot {
+			width: 8px;
+			height: 8px;
+			border-radius: 50%;
+		}
+
+		.status-active {
+			background: var(--accent-emerald);
+			box-shadow: 0 0 10px var(--accent-emerald);
+		}
+		.status-inactive {
+			background: #ef4444;
+		}
+
+		.actions-btn {
+			padding: 8px;
+			border-radius: 8px;
+			border: 1px solid var(--border-glass);
+			background: rgba(255, 255, 255, 0.05);
+			color: var(--text-secondary);
+			cursor: pointer;
+			transition: all 0.2s;
+		}
+
+		.actions-btn:hover {
+			color: white;
+			border-color: var(--text-secondary);
+			background: rgba(255, 255, 255, 0.1);
+		}
+	</style>
+{% endblock %}
+
+{% block admin_content %}
+	<header class="page-header">
+		<div>
+			<h1 class="page-title">User Management</h1>
+			<p style="color: var(--text-secondary); font-weight: 500;">Manage forensic investigators and supervisors</p>
+		</div>
+		<a href="{{ path('admin_invite') }}" class="btn" style="background: var(--accent-blue); color: white; padding: 0.75rem 1.5rem; border-radius: 14px; text-decoration: none; font-weight: 700; display: flex; align-items: center; gap: 0.5rem;">
+			<span class="material-symbols-outlined">person_add</span>
+			Invite New User
+		</a>
+	</header>
+
+	<div class="user-table-panel">
+		<table class="user-table">
+			<thead>
+				<tr>
+					<th>Member</th>
+					<th>Role</th>
+					<th>status</th>
+					<th>Contact</th>
+					<th>Actions</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for user in users %}
+					<tr class="user-row">
+						<td>
+							<div class="user-info-cell">
+								<div class="user-initials">
+									{{ user.firstName|slice(0,1) }}{{ user.lastName|slice(0,1) }}
+								</div>
+								<div class="user-name-text">
+									<span class="user-full-name">{{ user.firstName }}
+										{{ user.lastName }}</span>
+									<span class="user-email-text">{{ user.email }}</span>
+								</div>
+							</div>
+						</td>
+						<td>
+							{% if user.role == 'ROLE_SUPERVISOR' %}
+								<span class="role-badge role-supervisor">Supervisor</span>
+							{% else %}
+								<span class="role-badge role-investigator">Investigator</span>
+							{% endif %}
+						</td>
+						<td>
+							<div class="status-indicator">
+								<span class="status-dot {{ user.isActive ? 'status-active' : 'status-inactive' }}"></span>
+								{{ user.isActive ? 'Active' : 'Deactivated' }}
+							</div>
+						</td>
+						<td style="color: var(--text-secondary); font-size: 0.9rem;">
+							{{ user.tel }}
+						</td>
+						<td>
+							<a href="{{ path('app_admin_user_edit', {'id': user.id}) }}" class="actions-btn" title="Edit User" style="display: inline-flex; align-items: center; justify-content: center; text-decoration: none;">
+								<span class="material-symbols-outlined" style="font-size: 1.25rem;">edit</span>
+							</a>
+						</td>
+					</tr>
+				{% else %}
+					<tr>
+						<td colspan="5" style="text-align: center; padding: 3rem; color: var(--text-secondary);">
+							No forensic staff found in the system.
+						</td>
+					</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	</div>
+{% endblock %}
