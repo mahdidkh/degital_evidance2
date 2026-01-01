@@ -50,6 +50,19 @@
 
 	.page-header {
 		margin-bottom: 3.5rem;
+		display: flex;
+		justify-content: space-between;
+		align-items: flex-start;
+	}
+
+	.page-header-content {
+		flex: 1;
+	}
+
+	.search-container {
+		margin-bottom: 0;
+		margin-left: 2rem;
+		min-width: 300px;
 	}
 
 	.welcome-text {
@@ -228,6 +241,68 @@
 		border-radius: 24px;
 		border: 1px dashed var(--card-border);
 	}
+
+	/* Search Bar Styles */
+	.search-container {
+		min-width: 320px;
+	}
+
+	.search-wrapper {
+		position: relative;
+		display: flex;
+		align-items: center;
+	}
+
+	.search-icon {
+		position: absolute;
+		left: 1rem;
+		color: var(--text-secondary);
+		z-index: 1;
+		pointer-events: none;
+	}
+
+	.search-input {
+		width: 100%;
+		padding: 0.75rem 1rem 0.75rem 3rem;
+		background: var(--card-bg);
+		border: 1px solid var(--card-border);
+		border-radius: 12px;
+		color: var(--text-primary);
+		font-size: 0.9rem;
+		transition: all 0.3s ease;
+	}
+
+	.search-input:focus {
+		outline: none;
+		border-color: var(--accent-blue);
+		box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+		background: rgba(30, 41, 59, 0.9);
+	}
+
+	.search-input::placeholder {
+		color: var(--text-secondary);
+		font-size: 0.85rem;
+	}
+
+	.clear-btn {
+		position: absolute;
+		right: 0.75rem;
+		background: none;
+		border: none;
+		color: var(--text-secondary);
+		cursor: pointer;
+		padding: 0.25rem;
+		border-radius: 4px;
+		transition: all 0.2s ease;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.clear-btn:hover {
+		color: var(--accent-blue);
+		background: rgba(59, 130, 246, 0.1);
+	}
 </style>{% endblock %}{% block body %}
 {% include 'componant/sidebar_investigateur.html.twig' %}
 
@@ -240,14 +315,31 @@
 	</a>
 
 	<div class="page-header">
-		<span class="welcome-text">Case Management</span>
-		<h1 style="font-size: 2.5rem; font-weight: 900; margin: 0; color: white;">My Assigned Cases</h1>
-		<p style="color: var(--text-secondary); margin-top: 0.5rem; font-weight: 500;">
-			You have
-			{{ cases|length }}
-			case{{ cases|length != 1 ? 's' : '' }}
-			currently assigned for investigation.
-		</p>
+		<div class="page-header-content">
+			<span class="welcome-text">Case Management</span>
+			<h1 style="font-size: 2.5rem; font-weight: 900; margin: 0; color: white;">My Assigned Cases</h1>
+			<p style="color: var(--text-secondary); margin-top: 0.5rem; font-weight: 500;">
+				You have
+				{{ cases|length }}
+				case{{ cases|length != 1 ? 's' : '' }}
+				currently assigned for investigation.
+			</p>
+		</div>
+
+		<!-- Search Bar -->
+		<div class="search-container">
+			<div class="search-wrapper">
+				<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewbox="0 0 24 24" stroke="currentColor" class="search-icon">
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+				</svg>
+				<input type="text" id="caseSearch" placeholder="Search cases by title..." class="search-input">
+				<button type="button" id="clearSearch" class="clear-btn" style="display: none;">
+					<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewbox="0 0 24 24" stroke="currentColor">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+					</svg>
+				</button>
+			</div>
+		</div>
 	</div>
 
 	{% if cases|length > 0 %}
@@ -296,4 +388,95 @@
 			<p style="color: var(--text-secondary);">You'll see cases here once a supervisor assigns them to your teams.</p>
 		</div>
 	{% endif %}
-</div>{% endblock %}
+</div>{% endblock %}{% block javascripts %}
+{{ parent() }}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('caseSearch');
+    const clearBtn = document.getElementById('clearSearch');
+    const caseCards = document.querySelectorAll('.case-card');
+
+    if (!searchInput) {
+        console.error('Search input not found!');
+        return;
+    }
+
+    // Function to filter cases
+    function filterCases(searchTerm) {
+        const term = searchTerm.toLowerCase().trim();
+        let visibleCount = 0;
+
+        caseCards.forEach(card => {
+            const title = card.querySelector('.case-title').textContent.toLowerCase();
+            const isVisible = title.includes(term);
+            
+            card.style.display = isVisible ? 'flex' : 'none';
+            
+            if (isVisible) {
+                visibleCount++;
+                // Add fade-in animation
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                
+                setTimeout(() => {
+                    card.style.transition = 'all 0.3s ease';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, 50);
+            }
+        });
+
+        // Update results count
+        updateResultsCount(visibleCount);
+        
+        // Show/hide clear button
+        if (clearBtn) {
+            clearBtn.style.display = term ? 'flex' : 'none';
+        }
+    }
+
+    // Function to update results count
+    function updateResultsCount(count) {
+        const totalCount = caseCards.length;
+        const resultsText = document.querySelector('.page-header-content p');
+        
+        if (resultsText) {
+            if (count === totalCount) {
+                resultsText.innerHTML = `You have <strong>${totalCount}</strong> case${totalCount !== 1 ? 's' : ''} currently assigned for investigation.`;
+            } else {
+                resultsText.innerHTML = `Showing <strong>${count}</strong> of <strong>${totalCount}</strong> case${totalCount !== 1 ? 's' : ''} matching your search.`;
+            }
+        }
+    }
+
+    // Search input event listener
+    searchInput.addEventListener('input', function() {
+        filterCases(this.value);
+    });
+
+    // Clear search button
+    if (clearBtn) {
+        clearBtn.addEventListener('click', function() {
+            searchInput.value = '';
+            filterCases('');
+            searchInput.focus();
+        });
+    }
+
+    // Enter key support
+    searchInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+        }
+    });
+
+    // Focus styles
+    searchInput.addEventListener('focus', function() {
+        this.parentElement.style.transform = 'scale(1.02)';
+    });
+
+    searchInput.addEventListener('blur', function() {
+        this.parentElement.style.transform = 'scale(1)';
+    });
+});
+</script>{% endblock %}

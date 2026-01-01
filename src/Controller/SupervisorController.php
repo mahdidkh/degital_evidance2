@@ -194,6 +194,40 @@ class SupervisorController extends AbstractController
             ->getQuery()
             ->getResult();
 
+        // TEMPORARY: Add test cases if no cases exist
+        if (empty($caseworks)) {
+            $mockCases = [
+                (object)[
+                    'id' => 1,
+                    'title' => 'Corporate Espionage Investigation',
+                    'description' => 'Investigation into industrial secrets theft at TechCorp',
+                    'status' => 'open',
+                    'priority' => 'critical',
+                    'createdAt' => new \DateTimeImmutable('2024-01-20'),
+                    'assignedTeam' => (object)['name' => 'Special Investigations']
+                ],
+                (object)[
+                    'id' => 2,
+                    'title' => 'Financial Fraud Scheme',
+                    'description' => 'Complex Ponzi scheme affecting multiple investors',
+                    'status' => 'in_progress',
+                    'priority' => 'high',
+                    'createdAt' => new \DateTimeImmutable('2024-01-18'),
+                    'assignedTeam' => (object)['name' => 'Financial Crimes Unit']
+                ],
+                (object)[
+                    'id' => 3,
+                    'title' => 'Drug Trafficking Network',
+                    'description' => 'Major drug distribution ring operating across state lines',
+                    'status' => 'open',
+                    'priority' => 'critical',
+                    'createdAt' => new \DateTimeImmutable('2024-01-15'),
+                    'assignedTeam' => (object)['name' => 'Drug Enforcement']
+                ]
+            ];
+            $caseworks = $mockCases;
+        }
+
         return $this->render('supervisor/casework/index.html.twig', [
             'caseworks' => $caseworks,
         ]);
@@ -214,6 +248,29 @@ class SupervisorController extends AbstractController
             ['createdBy' => $supervisor, 'status' => 'archived'],
             ['updatedAt' => 'DESC']
         );
+
+        // TEMPORARY: Add test cases if no cases exist
+        if (empty($caseworks)) {
+            $mockCases = [
+                (object)[
+                    'id' => 1,
+                    'title' => 'Stolen Phone Investigation',
+                    'description' => 'Investigation of stolen mobile device recovered with evidence',
+                    'status' => 'archived',
+                    'updatedAt' => new \DateTimeImmutable('2024-01-10'),
+                    'assignedTeam' => (object)['name' => 'Digital Forensics']
+                ],
+                (object)[
+                    'id' => 2,
+                    'title' => 'Cold Case Homicide',
+                    'description' => 'Archived cold case reopened and solved using new DNA evidence',
+                    'status' => 'archived',
+                    'updatedAt' => new \DateTimeImmutable('2024-01-08'),
+                    'assignedTeam' => (object)['name' => 'Homicide Division']
+                ]
+            ];
+            $caseworks = $mockCases;
+        }
 
         return $this->render('supervisor/casework/archive.html.twig', [
             'caseworks' => $caseworks,

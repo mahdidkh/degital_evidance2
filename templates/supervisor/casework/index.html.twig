@@ -52,7 +52,7 @@
 
 	.btn-create {
 		padding: 0.875rem 1.75rem;
-		background: linear-gradient(135deg, #667eea, #764ba2);
+		background: linear-gradient(135deg, #3277e0ff);
 		color: white;
 		text-decoration: none;
 		border-radius: 10px;
@@ -200,6 +200,68 @@
 		padding: 4rem 0;
 		color: var(--text-secondary);
 	}
+
+	/* Search Bar Styles */
+	.search-container {
+		margin-bottom: 2rem;
+		max-width: 600px;
+	}
+
+	.search-wrapper {
+		position: relative;
+		display: flex;
+		align-items: center;
+	}
+
+	.search-icon {
+		position: absolute;
+		left: 1rem;
+		color: var(--text-secondary);
+		z-index: 1;
+		pointer-events: none;
+	}
+
+	.search-input {
+		width: 100%;
+		padding: 0.875rem 1rem 0.875rem 3rem;
+		background: var(--card-bg);
+		border: 1px solid rgba(59, 130, 246, 0.3);
+		border-radius: 12px;
+		color: var(--text-primary);
+		font-size: 0.95rem;
+		transition: all 0.3s ease;
+	}
+
+	.search-input:focus {
+		outline: none;
+		border-color: var(--accent-blue);
+		box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+		background: rgba(30, 41, 59, 0.6);
+	}
+
+	.search-input::placeholder {
+		color: var(--text-secondary);
+	}
+
+	.clear-btn {
+		position: absolute;
+		right: 1rem;
+		background: none;
+		border: none;
+		color: var(--text-secondary);
+		cursor: pointer;
+		padding: 0.25rem;
+		border-radius: 4px;
+		transition: all 0.2s ease;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.clear-btn:hover {
+		color: var(--accent-blue);
+		background: rgba(59, 130, 246, 0.1);
+	}
 </style>{% endblock %}{% block body %}
 {% include 'componant/sidebar_supervisor.html.twig' %}
 
@@ -226,6 +288,21 @@
 			</svg>
 			Create New Case
 		</a>
+	</div>
+
+	<!-- Search Bar -->
+	<div class="search-container">
+		<div class="search-wrapper">
+			<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewbox="0 0 24 24" stroke="currentColor" class="search-icon">
+				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+			</svg>
+			<input type="text" id="caseSearch" placeholder="Search cases by title..." class="search-input">
+			<button type="button" id="clearSearch" class="clear-btn" style="display: none;">
+				<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewbox="0 0 24 24" stroke="currentColor">
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+				</svg>
+			</button>
+		</div>
 	</div>
 
 	{% if caseworks|length > 0 %}
@@ -289,4 +366,84 @@
 			</a>
 		</div>
 	{% endif %}
-</div>{% endblock %}
+</div>{% endblock %}{% block javascripts %}
+{{ parent() }}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('caseSearch');
+    const clearBtn = document.getElementById('clearSearch');
+    const caseCards = document.querySelectorAll('.case-card');
+
+    // Function to filter cases
+    function filterCases(searchTerm) {
+        const term = searchTerm.toLowerCase().trim();
+        let visibleCount = 0;
+
+        caseCards.forEach(card => {
+            const title = card.querySelector('.case-title').textContent.toLowerCase();
+            const isVisible = title.includes(term);
+            
+            card.style.display = isVisible ? 'block' : 'none';
+            
+            if (isVisible) {
+                visibleCount++;
+                // Add fade-in animation
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                
+                setTimeout(() => {
+                    card.style.transition = 'all 0.3s ease';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, 50);
+            }
+        });
+
+        // Update results count
+        updateResultsCount(visibleCount);
+        
+        // Show/hide clear button
+        clearBtn.style.display = term ? 'flex' : 'none';
+    }
+
+    // Function to update results count
+    function updateResultsCount(count) {
+        const totalCount = caseCards.length;
+        const resultsText = document.querySelector('.page-header p');
+        
+        if (count === totalCount) {
+            resultsText.innerHTML = `${totalCount} case${totalCount !== 1 ? 's' : ''} total`;
+        } else {
+            resultsText.innerHTML = `Showing ${count} of ${totalCount} case${totalCount !== 1 ? 's' : ''} matching your search`;
+        }
+    }
+
+    // Search input event listener
+    searchInput.addEventListener('input', function() {
+        filterCases(this.value);
+    });
+
+    // Clear search button
+    clearBtn.addEventListener('click', function() {
+        searchInput.value = '';
+        filterCases('');
+        searchInput.focus();
+    });
+
+    // Enter key support
+    searchInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+        }
+    });
+
+    // Focus styles
+    searchInput.addEventListener('focus', function() {
+        this.parentElement.style.transform = 'scale(1.02)';
+    });
+
+    searchInput.addEventListener('blur', function() {
+        this.parentElement.style.transform = 'scale(1)';
+    });
+});
+</script>{% endblock %}

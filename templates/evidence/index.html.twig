@@ -10,10 +10,10 @@
 		<thead>
 			<tr>
 				<th>Id</th>
-				<th>Titre</th>
+				<th>Title</th>
 				<th>Description</th>
-				<th>Remarque</th>
-				<th>Fichier</th>
+				<th>Remark</th>
+				<th>File</th>
 				<th>Hash</th>
 				<th>Actions</th>
 			</tr>
@@ -30,10 +30,10 @@
 					<td>
 						{% if evidence.storedFilename %}
 							<a href="{{ asset('uploads/evidence/' ~ evidence.storedFilename) }}" target="_blank">
-								ouvrir
+								Open file
 							</a>
 						{% else %}
-							<em>Aucun fichier</em>
+							<em>No file available</em>
 						{% endif %}
 					</td>
 
@@ -46,25 +46,25 @@
 					</td>
 
 					<td>
-						<a class="btn btn-info btn-sm" href="{{ path('app_evidence_show', {'id': evidence.id}) }}">Voir</a>
-						<a class="btn btn-warning btn-sm" href="{{ path('app_evidence_edit', {'id': evidence.id}) }}">Modifier</a>
+						<a class="btn btn-info btn-sm" href="{{ path('app_evidence_show', {'id': evidence.id}) }}">View</a>
+						<a class="btn btn-warning btn-sm" href="{{ path('app_evidence_edit', {'id': evidence.id}) }}">Edit</a>
 
-						{# Bouton supprimer #}
-						<form action="{{ path('app_evidence_delete', {'id': evidence.id}) }}" method="post" style="display: inline-block;" onsubmit="return confirm('Supprimer cet élément ?');">
+						
+						<form action="{{ path('app_evidence_delete', {'id': evidence.id}) }}" method="post" style="display: inline-block;" onsubmit="return confirm('Are you sure you want to delete this item? ');">
 
 							<input type="hidden" name="_token" value="{{ csrf_token('delete' ~ evidence.id) }}">
-							<button class="btn btn-danger btn-sm">Supprimer</button>
+							<button class="btn btn-danger btn-sm">Delete</button>
 						</form>
 					</td>
 				</tr>
 			{% else %}
 				<tr>
-					<td colspan="7">Aucun enregistrement trouvé.</td>
+					<td colspan="7">No data found .</td>
 				</tr>
 			{% endfor %}
 		</tbody>
 	</table>
 
-	<a class="btn btn-primary" href="{{ path('app_evidence_new') }}">Créer nouveau</a>
+	<a class="btn btn-primary" href="{{ path('app_evidence_new') }}">Create a new evidence </a>
 
 {% endblock %}

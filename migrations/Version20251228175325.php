@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20251227014653 extends AbstractMigration
+final class Version20251228175325 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -20,7 +20,7 @@ final class Version20251227014653 extends AbstractMigration
     public function up(Schema $schema): void
     {
         // this up() migration is auto-generated, please modify it to your needs
-        $this->addSql('CREATE TABLE audit_log (id INT AUTO_INCREMENT NOT NULL, user_id INT DEFAULT NULL, target_user_id INT DEFAULT NULL, event_type VARCHAR(100) NOT NULL, event_description LONGTEXT NOT NULL, ip_address VARCHAR(45) DEFAULT NULL, user_agent LONGTEXT DEFAULT NULL, metadata JSON DEFAULT NULL, created_at DATETIME NOT NULL, severity VARCHAR(20) DEFAULT \'info\' NOT NULL, INDEX IDX_F6E1C0F5A76ED395 (user_id), INDEX IDX_F6E1C0F56C066AFE (target_user_id), INDEX idx_audit_created_at (created_at), INDEX idx_audit_event_type (event_type), INDEX idx_audit_severity (severity), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
+        $this->addSql('CREATE TABLE audit_log (id INT AUTO_INCREMENT NOT NULL, user_id INT DEFAULT NULL, target_user_id INT DEFAULT NULL, event_type VARCHAR(100) NOT NULL, event_description LONGTEXT NOT NULL, ip_address VARCHAR(45) DEFAULT NULL, user_agent LONGTEXT DEFAULT NULL, metadata JSON DEFAULT NULL COMMENT \'(DC2Type:json)\', created_at DATETIME NOT NULL, severity VARCHAR(20) DEFAULT \'info\' NOT NULL, INDEX IDX_F6E1C0F5A76ED395 (user_id), INDEX IDX_F6E1C0F56C066AFE (target_user_id), INDEX idx_audit_created_at (created_at), INDEX idx_audit_event_type (event_type), INDEX idx_audit_severity (severity), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE case_work (id INT AUTO_INCREMENT NOT NULL, assigned_team_id INT DEFAULT NULL, created_by_id INT NOT NULL, title VARCHAR(255) NOT NULL, status VARCHAR(255) NOT NULL, description VARCHAR(255) NOT NULL, priority VARCHAR(50) NOT NULL, created_at DATETIME NOT NULL COMMENT \'(DC2Type:datetime_immutable)\', updated_at DATETIME DEFAULT NULL COMMENT \'(DC2Type:datetime_immutable)\', INDEX IDX_D256B23323F46021 (assigned_team_id), INDEX IDX_D256B233B03A8386 (created_by_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE chain_of_custody (id INT AUTO_INCREMENT NOT NULL, evidence_id INT DEFAULT NULL, user_id INT DEFAULT NULL, action VARCHAR(255) NOT NULL, description VARCHAR(255) NOT NULL, date_update DATE NOT NULL, new_hash VARCHAR(255) NOT NULL, previos_hash VARCHAR(255) NOT NULL, INDEX IDX_90DA1918B528FC11 (evidence_id), INDEX IDX_90DA1918A76ED395 (user_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE evidence (id INT AUTO_INCREMENT NOT NULL, case_work_id INT DEFAULT NULL, uploaded_by_id INT DEFAULT NULL, title VARCHAR(255) NOT NULL, file_hash VARCHAR(255) NOT NULL, stored_filename VARCHAR(255) DEFAULT NULL, remarque LONGTEXT DEFAULT NULL, description VARCHAR(255) NOT NULL, created_at DATETIME DEFAULT NULL COMMENT \'(DC2Type:datetime_immutable)\', INDEX IDX_C6157101497A6D0 (case_work_id), INDEX IDX_C615710A2B28FE8 (uploaded_by_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');

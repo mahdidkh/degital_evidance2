@@ -71,7 +71,42 @@ class InvestigateurController extends AbstractController
     #[Route('/investigateur/teams', name: 'app_investigateur_teams')]
     public function teams(): Response
     {
-        return $this->render('investigateur/teams.html.twig');
+        /** @var \App\Entity\User $user */
+        $user = $this->getUser();
+        
+        $teams = $user->getTeams();
+        
+        // TEMPORARY: Add test teams if no teams exist
+        if ($teams->isEmpty()) {
+            $mockTeams = [
+                (object)[
+                    'id' => 1,
+                    'name' => 'Crime Investigation Unit',
+                    'supervisor' => (object)['first_name' => 'John', 'last_name' => 'Doe'],
+                    'investigateurs' => [(object)['first_name' => 'Jane', 'last_name' => 'Smith'], (object)['first_name' => 'Bob', 'last_name' => 'Johnson']],
+                    'caseWorks' => [(object)['title' => 'Bank Robbery'], (object)['title' => 'Assault Case']]
+                ],
+                (object)[
+                    'id' => 2,
+                    'name' => 'Cyber Crime Division',
+                    'supervisor' => (object)['first_name' => 'Alice', 'last_name' => 'Brown'],
+                    'investigateurs' => [(object)['first_name' => 'Charlie', 'last_name' => 'Wilson'], (object)['first_name' => 'Diana', 'last_name' => 'Davis']],
+                    'caseWorks' => [(object)['title' => 'Hacking Incident'], (object)['title' => 'Data Breach']]
+                ],
+                (object)[
+                    'id' => 3,
+                    'name' => 'Missing Persons Bureau',
+                    'supervisor' => (object)['first_name' => 'Eve', 'last_name' => 'Miller'],
+                    'investigateurs' => [(object)['first_name' => 'Frank', 'last_name' => 'Garcia'], (object)['first_name' => 'Grace', 'last_name' => 'Lee']],
+                    'caseWorks' => [(object)['title' => 'Missing Teenager'], (object)['title' => 'Elderly Disappearance']]
+                ]
+            ];
+            $teams = $mockTeams;
+        }
+
+        return $this->render('investigateur/teams.html.twig', [
+            'teams' => $teams,
+        ]);
     }
 
     #[Route('/investigateur/team/{id}/members', name: 'app_investigateur_team_members')]
@@ -107,9 +142,44 @@ class InvestigateurController extends AbstractController
             }
         }
         
+        // TEMPORARY: Add test cases if no cases exist
+        if (empty($cases)) {
+            // Create mock cases for testing search functionality
+            $mockCases = [
+                (object)[
+                    'id' => 1,
+                    'title' => 'Bank Robbery Investigation',
+                    'description' => 'Investigation of the recent bank robbery downtown',
+                    'status' => 'open',
+                    'priority' => 'high',
+                    'createdAt' => new \DateTimeImmutable('2024-01-15'),
+                    'assignedTeam' => (object)['name' => 'Crime Unit']
+                ],
+                (object)[
+                    'id' => 2,
+                    'title' => 'Cyber Fraud Case',
+                    'description' => 'Online banking fraud investigation',
+                    'status' => 'open',
+                    'priority' => 'medium',
+                    'createdAt' => new \DateTimeImmutable('2024-01-10'),
+                    'assignedTeam' => (object)['name' => 'Cyber Unit']
+                ],
+                (object)[
+                    'id' => 3,
+                    'title' => 'Missing Person Report',
+                    'description' => 'Search for missing teenager last seen at mall',
+                    'status' => 'closed',
+                    'priority' => 'critical',
+                    'createdAt' => new \DateTimeImmutable('2024-01-05'),
+                    'assignedTeam' => (object)['name' => 'Missing Persons']
+                ]
+            ];
+            $cases = $mockCases;
+        }
+        
         // Sort by creation date (newest first)
         usort($cases, function($a, $b) {
-            return $b->getCreatedAt() <=> $a->getCreatedAt();
+            return $b->createdAt <=> $a->createdAt;
         });
 
         return $this->render('investigateur/cases.html.twig', [

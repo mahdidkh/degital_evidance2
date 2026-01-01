@@ -401,7 +401,7 @@
 		<div class="glass-panel">
 			<div class="section-header">
 				<span class="material-symbols-outlined" style="color: var(--accent-blue)">fingerprint</span>
-				<h2>Dossier Evidence</h2>
+				<h2> Evidence folder</h2>
 				{% if casework.status == 'open' %}
 					<a href="{{ path('app_evidence_new', {'case_id': casework.id}) }}" class="btn-add-evidence">
 						<span class="material-symbols-outlined" style="font-size: 1.1rem;">add_circle</span>
@@ -445,7 +445,7 @@
 
 							{% if evidence.remarque %}
 								<div class="remarque-box">
-									<strong>Remarque:</strong>
+									<strong>Remark:</strong>
 									{{ evidence.remarque }}
 								</div>
 							{% endif %}

@@ -48,7 +48,7 @@ class ChainOfCustody
         return $this->action;
     }
 
-    public function setAction(string $action): static
+    public function setAction(?string $action): static
     {
         $this->action = $action;
 
@@ -60,7 +60,7 @@ class ChainOfCustody
         return $this->description;
     }
 
-    public function setDescription(string $description): static
+    public function setDescription(?string $description): static
     {
         $this->description = $description;
 
@@ -72,7 +72,7 @@ class ChainOfCustody
         return $this->date_update;
     }
 
-    public function setDateUpdate(\DateTime $date_update): static
+    public function setDateUpdate(?\DateTime $date_update): static
     {
         $this->date_update = $date_update;
 
@@ -84,7 +84,7 @@ class ChainOfCustody
         return $this->newHash;
     }
 
-    public function setNewHash(string $newHash): static
+    public function setNewHash(?string $newHash): static
     {
         $this->newHash = $newHash;
 
@@ -96,7 +96,7 @@ class ChainOfCustody
         return $this->PreviosHash;
     }
 
-    public function setPreviosHash(string $PreviosHash): static
+    public function setPreviosHash(?string $PreviosHash): static
     {
         $this->PreviosHash = $PreviosHash;
 
