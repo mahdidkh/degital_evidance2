@@ -1,0 +1,311 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Welcome | Digital Evidence Management{% endblock %}
+
+{% block stylesheets %}
+<style>
+    :root {
+        --primary-blue: #00d2ff;
+        --accent-cyan: #3a7bd5;
+        --dark-bg: #030712;
+        --glass-bg: rgba(255, 255, 255, 0.03);
+        --glass-border: rgba(255, 255, 255, 0.08);
+        --text-white: #f8fafc;
+        --text-muted: #94a3b8;
+    }
+
+    body {
+        background-color: var(--dark-bg);
+        color: var(--text-white);
+        font-family: 'Outfit', 'Inter', sans-serif;
+        margin: 0;
+        overflow-x: hidden;
+    }
+
+    /* Hero Section */
+    .hero {
+        position: relative;
+        height: 100vh;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+    }
+
+    #hero-video {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        min-width: 100%;
+        min-height: 100%;
+        width: auto;
+        height: auto;
+        z-index: -1;
+        transform: translate(-50%, -50%);
+        object-fit: cover;
+    }
+
+    .hero-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: radial-gradient(circle at center, rgba(3, 7, 18, 0.2), rgba(3, 7, 18, 0.95));
+        z-index: 0;
+    }
+
+    .hero-content {
+        text-align: center;
+        max-width: 1000px;
+        padding: 2rem;
+        z-index: 10;
+        animation: fadeIn 2s ease-out;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(30px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .hero h1 {
+        font-size: clamp(3rem, 10vw, 6rem);
+        font-weight: 900;
+        margin-bottom: 1rem;
+        background: linear-gradient(to bottom, #fff, #94a3b8);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        letter-spacing: -0.05em;
+        line-height: 1;
+        text-transform: uppercase;
+    }
+
+    .hero p {
+        font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+        color: var(--text-muted);
+        margin-bottom: 3.5rem;
+        max-width: 800px;
+        margin-left: auto;
+        margin-right: auto;
+        font-weight: 300;
+    }
+
+    /* Modern Glass Nav/Buttons */
+    .btn-group {
+        display: flex;
+        gap: 2rem;
+        justify-content: center;
+    }
+
+    .btn-custom {
+        padding: 1.25rem 3.5rem;
+        font-size: 0.9rem;
+        font-weight: 800;
+        border-radius: 4px;
+        text-decoration: none;
+        transition: all 0.4s ease;
+        text-transform: uppercase;
+        letter-spacing: 0.2em;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .btn-login {
+        background: #fff;
+        color: #000;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    }
+
+    .btn-login:hover {
+        background: var(--primary-blue);
+        color: #fff;
+        transform: scale(1.05);
+    }
+
+    .btn-register {
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(10px);
+        color: #fff;
+    }
+
+    .btn-register:hover {
+        background: rgba(255, 255, 255, 0.15);
+        transform: scale(1.05);
+    }
+
+    /* Grid Sections - using assets as design elements */
+    .feature-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0;
+        background: #000;
+    }
+
+    .feature-item {
+        height: 600px;
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 4rem;
+    }
+
+    .feature-img {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        opacity: 0.5;
+        z-index: 0;
+        transition: transform 1s ease, opacity 0.5s ease;
+    }
+
+    .feature-item:hover .feature-img {
+        transform: scale(1.1);
+        opacity: 0.7;
+    }
+
+    .feature-text {
+        position: relative;
+        z-index: 1;
+        text-align: center;
+    }
+
+    .feature-text h2 {
+        font-size: 3rem;
+        font-weight: 800;
+        margin-bottom: 1.5rem;
+    }
+
+    .feature-text p {
+        color: var(--text-muted);
+        font-size: 1.1rem;
+        max-width: 400px;
+        line-height: 1.6;
+    }
+
+    /* Mosaic Gallery */
+    .mosaic {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        grid-template-rows: repeat(2, 400px);
+        gap: 10px;
+        padding: 10px;
+        background: #000;
+    }
+
+    .mosaic-item {
+        position: relative;
+        overflow: hidden;
+        border-radius: 4px;
+    }
+
+    .mosaic-item img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 1s ease;
+    }
+
+    .mosaic-item:hover img {
+        transform: scale(1.1);
+    }
+
+    .mosaic-item.large {
+        grid-column: span 2;
+        grid-row: span 2;
+    }
+
+    footer {
+        padding: 6rem 2rem;
+        text-align: center;
+        background: #000;
+        border-top: 1px solid #111;
+    }
+
+    footer p {
+        font-size: 0.8rem;
+        color: #444;
+        letter-spacing: 0.3em;
+    }
+
+    @media (max-width: 900px) {
+        .feature-grid {
+            grid-template-columns: 1fr;
+        }
+        .mosaic {
+            grid-template-columns: repeat(2, 1fr);
+            grid-template-rows: auto;
+        }
+        .mosaic-item.large {
+            grid-column: span 2;
+            grid-row: span 1;
+            height: 400px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="landing-wrapper">
+    <!-- Hero Section -->
+    <section class="hero">
+        <video autoplay muted loop playsinline id="hero-video">
+            <source src="{{ asset('images/home/hero_video.mp4') }}" type="video/mp4">
+        </video>
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <h1>Evidence Cloud</h1>
+            <p>The next generation of digital forensics and case management. Secure. Transparent. Immutable.</p>
+            <div class="btn-group">
+                <a href="{{ path('app_login') }}" class="btn-custom btn-login">Login</a>
+                <a href="{{ path('app_register') }}" class="btn-custom btn-register">Register</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Design Features -->
+    <section class="feature-grid">
+        <div class="feature-item">
+            <img src="{{ asset('images/home/evidence_1.jpg') }}" class="feature-img" alt="Design 1">
+            <div class="feature-text">
+                <h2>Forensics</h2>
+                <p>Advanced tools for digital investigation and evidence recovery.</p>
+            </div>
+        </div>
+        <div class="feature-item">
+            <img src="{{ asset('images/home/evidence_2.jpg') }}" class="feature-img" alt="Design 2">
+            <div class="feature-text">
+                <h2>Integrity</h2>
+                <p>Blockchain-grade hashing ensures your evidence remains untouched.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Mosaic Design -->
+    <section class="mosaic">
+        <div class="mosaic-item large">
+            <img src="{{ asset('images/home/evidence_3.jpg') }}" alt="Mosaic 1">
+        </div>
+        <div class="mosaic-item">
+            <img src="{{ asset('images/home/evidence_4.jpg') }}" alt="Mosaic 2">
+        </div>
+        <div class="mosaic-item">
+            <img src="{{ asset('images/home/evidence_5.jpg') }}" alt="Mosaic 3">
+        </div>
+        <div class="mosaic-item">
+            <img src="{{ asset('images/home/evidence_6.jpg') }}" alt="Mosaic 4">
+        </div>
+        <div class="mosaic-item">
+            <img src="{{ asset('images/home/evidence_7.jpg') }}" alt="Mosaic 5">
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; DIGITAL EVIDENCE SYSTEM | 2026</p>
+    </footer>
+</div>
+{% endblock %}
