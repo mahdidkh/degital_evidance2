@@ -1,7 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}New Evidence | Digital Evidence
-
+{% block title %}Nouveau Evidence | Digital Evidence
 {% endblock %}
 
 {% block body %}
@@ -169,23 +168,20 @@
 <div class="evidence-page">
 	<div class="form-wrapper">
 		<header class="page-header">
-			<h1>New Evidence</h1>
+			<h1>Nouvelle Evidence</h1>
 			{% if evidence.caseWork %}
 				<div class="case-context">
 					<span class="material-symbols-outlined">folder</span>
-					Case:
+					Dossier:
 					{{ evidence.caseWork.title }}
 				</div>
 			{% endif %}
 		</header>
 
-		{{ include('evidence/_form.html.twig', {'button_label': 'Add Evidence'}) }}
+		{{ include('evidence/_form.html.twig', {'button_label': 'Ajouter Evidence'}) }}
 
-		<footer class="form-actions">
-			<a class="btn-back" href="{{ path('app_case_work_index') }}">
-				<span class="material-symbols-outlined">arrow_back</span>
-				Back to the case list 
-			</a>
-		</footer>
-	</div>
-</div>{% endblock %}
+		<a class="btn-back" href="{{ path('app_investigateur_case_explore', {id: evidence.caseWork.id}) }}">
+			Retour à la liste des cases
+		</a>
+	</footer>
+</div></div>{% endblock %}

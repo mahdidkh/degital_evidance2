@@ -23,13 +23,6 @@ use App\Entity\CaseWork;
 #[IsGranted('ROLE_INVESTIGATEUR')]
 final class EvidenceController extends AbstractController
 {
-    #[Route(name: 'app_evidence_index', methods: ['GET'])]
-    public function index(EvidenceRepository $evidenceRepository): Response
-    {
-        return $this->render('evidence/index.html.twig', [
-            'evidences' => $evidenceRepository->findAll(),
-        ]);
-    }
 
     #[Route('/new', name: 'app_evidence_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager, SluggerInterface $slugger, \App\Service\AuditService $auditService): Response
@@ -93,8 +86,7 @@ final class EvidenceController extends AbstractController
             $chainEntry->setAction('Initial Seizure');
             $chainEntry->setDescription('Evidence secured and hashed upon upload');
             $chainEntry->setDateUpdate(new \DateTime());
-            $chainEntry->setNewHash($evidence->getFileHash());
-            $chainEntry->setPreviosHash($evidence->getFileHash()); // Same for first entry
+            $chainEntry->setPreviousHash($evidence->getFileHash()); // Same for first entry
             $chainEntry->setEvidence($evidence);
             $chainEntry->setUser($this->getUser());
 
@@ -141,31 +133,6 @@ final class EvidenceController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'app_evidence_show', methods: ['GET'])]
-    public function show(Evidence $evidence): Response
-    {
-        return $this->render('evidence/show.html.twig', [
-            'evidence' => $evidence,
-        ]);
-    }
-
-    #[Route('/{id}/edit', name: 'app_evidence_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Evidence $evidence, EntityManagerInterface $entityManager): Response
-    {
-        $form = $this->createForm(EvidenceType::class, $evidence);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->flush();
-
-            return $this->redirectToRoute('app_evidence_index', [], Response::HTTP_SEE_OTHER);
-        }
-
-        return $this->render('evidence/edit.html.twig', [
-            'evidence' => $evidence,
-            'form' => $form,
-        ]);
-    }
 
     #[Route('/{id}', name: 'app_evidence_delete', methods: ['POST'])]
     public function delete(Request $request, Evidence $evidence, EntityManagerInterface $entityManager): Response

@@ -28,7 +28,7 @@ class ChainOfCustody
     private ?string $newHash = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $PreviosHash = null;
+    private ?string $previousHash = null;
 
     #[ORM\ManyToOne(targetEntity: Evidence::class, inversedBy: 'chainEntries')]
     private ?Evidence $evidence = null;
@@ -48,7 +48,7 @@ class ChainOfCustody
         return $this->action;
     }
 
-    public function setAction(?string $action): static
+    public function setAction(string $action): static
     {
         $this->action = $action;
 
@@ -60,7 +60,7 @@ class ChainOfCustody
         return $this->description;
     }
 
-    public function setDescription(?string $description): static
+    public function setDescription(string $description): static
     {
         $this->description = $description;
 
@@ -72,7 +72,7 @@ class ChainOfCustody
         return $this->date_update;
     }
 
-    public function setDateUpdate(?\DateTime $date_update): static
+    public function setDateUpdate(\DateTime $date_update): static
     {
         $this->date_update = $date_update;
 
@@ -84,21 +84,21 @@ class ChainOfCustody
         return $this->newHash;
     }
 
-    public function setNewHash(?string $newHash): static
+    public function setNewHash(string $newHash): static
     {
         $this->newHash = $newHash;
 
         return $this;
     }
 
-    public function getPreviosHash(): ?string
+    public function getPreviousHash(): ?string
     {
-        return $this->PreviosHash;
+        return $this->previousHash;
     }
 
-    public function setPreviosHash(?string $PreviosHash): static
+    public function setPreviousHash(string $previousHash): static
     {
-        $this->PreviosHash = $PreviosHash;
+        $this->previousHash = $previousHash;
 
         return $this;
     }
