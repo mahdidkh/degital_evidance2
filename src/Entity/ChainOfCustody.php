@@ -28,7 +28,7 @@ class ChainOfCustody
     private ?string $newHash = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $PreviosHash = null;
+    private ?string $previousHash = null;
 
     #[ORM\ManyToOne(targetEntity: Evidence::class, inversedBy: 'chainEntries')]
     private ?Evidence $evidence = null;
@@ -91,14 +91,14 @@ class ChainOfCustody
         return $this;
     }
 
-    public function getPreviosHash(): ?string
+    public function getPreviousHash(): ?string
     {
-        return $this->PreviosHash;
+        return $this->previousHash;
     }
 
-    public function setPreviosHash(string $PreviosHash): static
+    public function setPreviousHash(string $previousHash): static
     {
-        $this->PreviosHash = $PreviosHash;
+        $this->previousHash = $previousHash;
 
         return $this;
     }

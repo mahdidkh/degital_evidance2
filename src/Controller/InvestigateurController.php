@@ -152,7 +152,7 @@ class InvestigateurController extends AbstractController
     }
 
     #[Route('/investigateur/evidence/{id}/verify', name: 'app_investigateur_evidence_verify', methods: ['POST'])]
-    public function verifyIntegrity(Evidence $evidence, EntityManagerInterface $entityManager, \App\Service\AuditService $auditService): JsonResponse
+    public function verifyIntegrity(Evidence $evidence, \App\Service\IntegrityService $integrityService): JsonResponse
     {
         /** @var \App\Entity\User $user */
         $user = $this->getUser();
@@ -164,62 +164,8 @@ class InvestigateurController extends AbstractController
              return new JsonResponse(['status' => 'error', 'message' => 'Access denied.'], 403);
         }
 
-        $destination = $this->getParameter('evidence_directory');
-        $filePath = $destination . '/' . $evidence->getStoredFilename();
+        $result = $integrityService->verifyEvidenceIntegrity($evidence, $user, 'Investigator');
 
-        if (!file_exists($filePath)) {
-            return new JsonResponse(['status' => 'error', 'message' => 'File not found on server.'], 404);
-        }
-
-        $currentHash = hash_file('sha256', $filePath);
-        $storedHash = $evidence->getFileHash();
-
-        if ($currentHash === $storedHash) {
-            $status = 'verified';
-            $message = 'Integrity verified. File is unchanged.';
-        } else {
-            $status = 'tampered';
-            $message = 'TAMPERED! Current hash does not match stored hash.';
-        }
-
-        // Log this check in the Chain of Custody for forensics
-        $chainEntry = new ChainOfCustody();
-        $chainEntry->setAction('Integrity Verification');
-        $chainEntry->setDescription(sprintf('Verification performed. status: %s. Message: %s', strtoupper($status), $message));
-        $chainEntry->setDateUpdate(new \DateTime());
-        $chainEntry->setNewHash($currentHash);
-        $chainEntry->setPreviosHash($storedHash);
-        $chainEntry->setEvidence($evidence);
-        $chainEntry->setUser($user);
-
-        $entityManager->persist($chainEntry);
-        $entityManager->flush();
-
-        // Log to audit system
-        if ($status === 'tampered') {
-            $auditService->logTamperedAlert($user, $evidence, [
-                'current_hash' => $currentHash,
-                'stored_hash' => $storedHash
-            ]);
-        } else {
-            $auditService->logIntegrityCheck($user, $evidence, $status, [
-                'hash' => $currentHash
-            ]);
-        }
-
-        if ($status === 'verified') {
-            return new JsonResponse([
-                'status' => 'verified',
-                'message' => $message,
-                'hash' => $currentHash
-            ]);
-        } else {
-            return new JsonResponse([
-                'status' => 'tampered',
-                'message' => $message,
-                'current_hash' => $currentHash,
-                'stored_hash' => $storedHash
-            ]);
-        }
+        return new JsonResponse($result);
     }
 }
