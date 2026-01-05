@@ -25,11 +25,8 @@
 
 	.creator-container {
 		margin-left: var(--sidebar-width);
-		padding: 4rem 2rem;
+		padding: 2rem;
 		min-height: 100vh;
-		display: flex;
-		justify-content: center;
-		align-items: flex-start;
 	}
 
 	.flash-messages-container {
@@ -42,7 +39,6 @@
 		border: 1px solid var(--card-border);
 		border-radius: 16px;
 		width: 100%;
-		max-width: 600px;
 		padding: 3rem;
 	}
 
@@ -138,6 +134,100 @@
 		color: var(--accent-blue);
 		flex-shrink: 0;
 	}
+
+	.search-container {
+		margin-bottom: 2rem;
+	}
+
+	.search-input {
+		background-color: rgba(15, 23, 42, 0.5);
+		border: 1px solid var(--card-border);
+		color: #fff;
+		padding: 0.75rem 1rem;
+		border-radius: 10px;
+		font-size: 1rem;
+		width: 100%;
+		margin-bottom: 1rem;
+	}
+
+	.search-input:focus {
+		background-color: var(--bg-dark);
+		border-color: var(--accent-blue);
+		box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+		color: #fff;
+		outline: none;
+	}
+
+	.teams-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+		gap: 1rem;
+		margin-bottom: 2rem;
+	}
+
+	.team-card {
+		background: rgba(30, 41, 59, 0.5);
+		border: 1px solid var(--card-border);
+		border-radius: 12px;
+		padding: 1.5rem;
+		transition: all 0.3s;
+	}
+
+	.team-card:hover {
+		border-color: var(--accent-blue);
+		transform: translateY(-2px);
+	}
+
+	.team-name {
+		font-size: 1.25rem;
+		font-weight: 700;
+		color: var(--accent-blue);
+		margin-bottom: 0.5rem;
+	}
+
+	.team-stats {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		margin-bottom: 1rem;
+	}
+
+	.team-members {
+		color: var(--text-secondary);
+		font-size: 0.875rem;
+	}
+
+	.team-cases {
+		color: var(--text-secondary);
+		font-size: 0.875rem;
+	}
+
+	.btn-manage {
+		background: rgba(59, 130, 246, 0.1);
+		color: var(--accent-blue);
+		border: 1px solid rgba(59, 130, 246, 0.2);
+		padding: 0.5rem 1rem;
+		border-radius: 8px;
+		text-decoration: none;
+		font-size: 0.875rem;
+		font-weight: 600;
+		transition: all 0.2s;
+		display: inline-block;
+		width: 100%;
+		text-align: center;
+	}
+
+	.btn-manage:hover {
+		background: var(--accent-blue);
+		color: white;
+	}
+
+	.no-teams {
+		text-align: center;
+		color: var(--text-secondary);
+		padding: 2rem;
+		font-style: italic;
+	}
 </style>{% endblock %}{% block body %}
 {% include 'componant/sidebar_supervisor.html.twig' %}
 
@@ -155,20 +245,55 @@
 			<p class="text-secondary">Define your investigative units and manage your assets.</p>
 		</div>
 
+		<!-- Existing Teams Section -->
+		<div class="search-container">
+			<input type="text" class="search-input" id="teamSearch" placeholder="Search existing teams...">
+		</div>
+
+		{% if teams is not empty %}
+			<div class="teams-grid" id="teamsGrid">
+				{% for team in teams %}
+					<div class="team-card">
+						<h3 class="team-name">{{ team.name }}</h3>
+						<div class="team-stats">
+							<span class="team-members">
+								<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewbox="0 0 24 24" stroke="currentColor" style="display: inline; margin-right: 0.25rem;">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
+								</svg>
+								{{ team.investigateurs|length }} Members
+							</span>
+							<span class="team-cases">
+								<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewbox="0 0 24 24" stroke="currentColor" style="display: inline; margin-right: 0.25rem;">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+								</svg>
+								{{ team.caseWorks|length }} Cases
+							</span>
+						</div>
+						<a href="{{ path('app_supervisor_team_manage', {id: team.id}) }}" class="btn-manage">
+							Manage Team
+						</a>
+					</div>
+				{% endfor %}
+			</div>
+		{% else %}
+			<div class="no-teams">
+				<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="none" viewbox="0 0 24 24" stroke="currentColor" style="margin: 0 auto 1rem; opacity: 0.3;">
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+				</svg>
+				<p>No teams created yet. Create your first team below!</p>
+			</div>
+		{% endif %}
+
 		<form action="{{ path('app_supervisor_team_new') }}" method="POST">
 			<div class="mb-5">
 				<label for="teamName" class="form-label">Team Designation</label>
-				<input type="text" class="form-control" id="teamName" name="name" placeholder="e.g. Forensics Unit Beta" required autofocus>
+				<input type="text" class="form-control" id="teamName" name="name" placeholder="add investigative" required autofocus>
 			</div>
 
-			<div class="pro-tip mb-4">
-				<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewbox="0 0 24 24" stroke="currentColor">
-					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-				</svg>
-				<div>
-					<strong>Pro Tip:</strong>
-					Use a clear name. You'll be able to assign investigators right after synchronization.
-				</div>
+			
+			
+			<div>
+					 Choose a team name that reflects its mission or specialty to enhance clarity and organization within your supervisory structure.
 			</div>
 
 			<button type="submit" class="btn-premium">
@@ -176,4 +301,21 @@
 			</button>
 		</form>
 	</div>
-</div>{% endblock %}
+</div>
+
+<script>
+document.getElementById('teamSearch').addEventListener('input', function() {
+    const searchTerm = this.value.toLowerCase();
+    const teamCards = document.querySelectorAll('.team-card');
+    
+    teamCards.forEach(card => {
+        const teamName = card.querySelector('.team-name').textContent.toLowerCase();
+        if (teamName.includes(searchTerm)) {
+            card.style.display = 'block';
+        } else {
+            card.style.display = 'none';
+        }
+    });
+});
+</script>
+{% endblock %}

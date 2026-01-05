@@ -14,6 +14,7 @@ use App\Entity\Investigateur;
 use App\Entity\CaseWork;
 use App\Entity\Evidence;
 use App\Entity\ChainOfCustody;
+use App\Entity\AuditLog;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 #[IsGranted('ROLE_SUPERVISOR')]
@@ -47,6 +48,47 @@ class SupervisorController extends AbstractController
                 ->getResult();
         }
 
+        // Fetch recent team-related audit logs
+        $auditLogs = $entityManager->getRepository(AuditLog::class)
+            ->createQueryBuilder('a')
+            ->where('a.user = :supervisor')
+            ->andWhere('a.eventType IN (:teamEvents)')
+            ->setParameter('supervisor', $supervisor)
+            ->setParameter('teamEvents', ['team_created', 'team_deleted', 'team_member_added', 'team_member_removed', 'case_assigned_to_team', 'case_removed_from_team'])
+            ->orderBy('a.createdAt', 'DESC')
+            ->setMaxResults(5)
+            ->getQuery()
+            ->getResult();
+
+        // Combine and sort activities
+        $allActivities = [];
+
+        // Add ChainOfCustody activities
+        foreach ($recentActivities as $activity) {
+            $allActivities[] = [
+                'action' => $activity->getAction(),
+                'description' => $activity->getDescription(),
+                'dateUpdate' => $activity->getDateUpdate(),
+                'type' => 'evidence'
+            ];
+        }
+
+        // Add AuditLog activities
+        foreach ($auditLogs as $log) {
+            $allActivities[] = [
+                'action' => ucfirst(str_replace('_', ' ', $log->getEventType())),
+                'description' => $log->getEventDescription(),
+                'dateUpdate' => $log->getCreatedAt(),
+                'type' => 'audit'
+            ];
+        }
+
+        // Sort by date descending and take top 5
+        usort($allActivities, function($a, $b) {
+            return $b['dateUpdate'] <=> $a['dateUpdate'];
+        });
+        $allActivities = array_slice($allActivities, 0, 5);
+
         return $this->render('supervisor/index.html.twig', [
             'teams' => $teams,
             'stats' => [
@@ -54,7 +96,7 @@ class SupervisorController extends AbstractController
                 'total_cases' => $totalCases,
                 'total_investigators' => $totalInvestigators,
             ],
-            'recent_activities' => $recentActivities,
+            'recent_activities' => $allActivities,
         ]);
     }
 
@@ -92,7 +134,11 @@ class SupervisorController extends AbstractController
             return $this->redirectToRoute('app_supervisor_index');
         }
 
-        return $this->render('supervisor/team/new.html.twig');
+        $teams = $entityManager->getRepository(Team::class)->findBy(['supervisor' => $supervisor]);
+
+        return $this->render('supervisor/team/new.html.twig', [
+            'teams' => $teams,
+        ]);
     }
 
     #[Route('/supervisor/team/{id}/manage', name: 'app_supervisor_team_manage', methods: ['GET'])]
@@ -102,7 +148,7 @@ class SupervisorController extends AbstractController
         $supervisor = $this->getUser();
 
         
-        // Get available investigators (not already in the team) under this supervisor or unassigned
+       
         $availableInvestigators = $entityManager->getRepository(Investigateur::class)->createQueryBuilder('i')
             ->where('i.supervisor = :supervisor')
             ->orWhere('i.supervisor IS NULL')
@@ -110,14 +156,27 @@ class SupervisorController extends AbstractController
             ->getQuery()
             ->getResult();
         
-        // Filter out those already in the current team
+        
         $availableInvestigators = array_filter($availableInvestigators, function($inv) use ($team) {
             return !$inv->getTeams()->contains($team);
         });
 
+        
+        $availableCases = $entityManager->getRepository(CaseWork::class)->createQueryBuilder('c')
+            ->where('c.createdBy = :supervisor')
+            ->andWhere('c.assignedTeam != :team OR c.assignedTeam IS NULL')
+            ->andWhere('c.status != :archived')
+            ->setParameter('supervisor', $supervisor)
+            ->setParameter('team', $team)
+            ->setParameter('archived', 'archived')
+            ->orderBy('c.createdAt', 'DESC')
+            ->getQuery()
+            ->getResult();
+
         return $this->render('supervisor/team/manage.html.twig', [
             'team' => $team,
             'availableInvestigators' => $availableInvestigators,
+            'availableCases' => $availableCases,
         ]);
     }
 
@@ -178,12 +237,128 @@ class SupervisorController extends AbstractController
         $investigator->removeTeam($team);
         $entityManager->flush();
 
-        // Log team membership change
+        
         $auditService->logTeamMembershipChange($supervisor, $investigator, $team->getName(), 'removed');
 
         $this->addFlash('success', sprintf('%s removed from team %s.', $investigator->getEmail(), $team->getName()));
 
         return $this->redirectToRoute('app_supervisor_team_manage', ['id' => $team->getId()]);
+    }
+
+    #[Route('/supervisor/team/{id}/assign-case', name: 'app_supervisor_team_assign_case', methods: ['POST'])]
+    public function assignCase(Team $team, Request $request, EntityManagerInterface $entityManager, \App\Service\AuditService $auditService): Response
+    {
+        /** @var Supervisor $supervisor */
+        $supervisor = $this->getUser();
+
+        if ($team->getSupervisor() !== $supervisor) {
+            throw $this->createAccessDeniedException('You are not authorized to manage this team.');
+        }
+
+        $caseId = $request->request->get('caseId');
+        $casework = $entityManager->getRepository(CaseWork::class)->find($caseId);
+
+        if (!$casework || $casework->getCreatedBy() !== $supervisor) {
+            $this->addFlash('error', 'Case not found or access denied.');
+            return $this->redirectToRoute('app_supervisor_team_manage', ['id' => $team->getId()]);
+        }
+
+        $oldTeam = $casework->getAssignedTeam();
+        $casework->setAssignedTeam($team);
+        $entityManager->flush();
+
+        
+        $auditService->logGenericEvent(
+            'case_assigned_to_team',
+            sprintf('Supervisor "%s %s" assigned case "%s" to team "%s"', 
+                $supervisor->getFirstName(), $supervisor->getLastName(), 
+                $casework->gettitle(), $team->getName()),
+            $supervisor,
+            'info',
+            [
+                'case_id' => $casework->getId(),
+                'case_title' => $casework->gettitle(),
+                'team_name' => $team->getName(),
+                'old_team' => $oldTeam ? $oldTeam->getName() : null
+            ]
+        );
+
+        $this->addFlash('success', sprintf('Case "%s" assigned to team %s.', $casework->gettitle(), $team->getName()));
+
+        return $this->redirectToRoute('app_supervisor_team_manage', ['id' => $team->getId()]);
+    }
+
+    #[Route('/supervisor/team/{id}/remove-case/{caseId}', name: 'app_supervisor_team_remove_case', methods: ['POST'])]
+    public function removeCaseFromTeam(Team $team, int $caseId, EntityManagerInterface $entityManager, \App\Service\AuditService $auditService): Response
+    {
+        /** @var Supervisor $supervisor */
+        $supervisor = $this->getUser();
+
+        if ($team->getSupervisor() !== $supervisor) {
+            throw $this->createAccessDeniedException('You are not authorized to manage this team.');
+        }
+
+        $casework = $entityManager->getRepository(CaseWork::class)->find($caseId);
+
+        if (!$casework || $casework->getAssignedTeam() !== $team) {
+            $this->addFlash('error', 'Case not found in this team.');
+            return $this->redirectToRoute('app_supervisor_team_manage', ['id' => $team->getId()]);
+        }
+
+        $casework->setAssignedTeam(null);
+        $entityManager->flush();
+
+        // Log case removal
+        $auditService->logGenericEvent(
+            'case_removed_from_team',
+            sprintf('Supervisor "%s %s" removed case "%s" from team "%s"', 
+                $supervisor->getFirstName(), $supervisor->getLastName(), 
+                $casework->gettitle(), $team->getName()),
+            $supervisor,
+            'info',
+            [
+                'case_id' => $casework->getId(),
+                'case_title' => $casework->gettitle(),
+                'team_name' => $team->getName()
+            ]
+        );
+
+        $this->addFlash('success', sprintf('Case "%s" removed from team %s.', $casework->gettitle(), $team->getName()));
+
+        return $this->redirectToRoute('app_supervisor_team_manage', ['id' => $team->getId()]);
+    }
+
+    #[Route('/supervisor/team/{id}/delete', name: 'app_supervisor_team_delete', methods: ['POST'])]
+    public function deleteTeam(Team $team, EntityManagerInterface $entityManager, \App\Service\AuditService $auditService): Response
+    {
+        /** @var Supervisor $supervisor */
+        $supervisor = $this->getUser();
+
+        if ($team->getSupervisor() !== $supervisor) {
+            throw $this->createAccessDeniedException('You are not authorized to delete this team.');
+        }
+
+        
+        foreach ($team->getCaseWorks() as $casework) {
+            $casework->setAssignedTeam(null);
+        }
+
+        $teamName = $team->getName();
+        $entityManager->remove($team);
+        $entityManager->flush();
+
+        
+        $auditService->logGenericEvent(
+            'team_deleted',
+            sprintf('Supervisor "%s %s" deleted team "%s"', $supervisor->getFirstName(), $supervisor->getLastName(), $teamName),
+            $supervisor,
+            'warning',
+            ['team_name' => $teamName]
+        );
+
+        $this->addFlash('success', sprintf('Team "%s" deleted successfully.', $teamName));
+
+        return $this->redirectToRoute('app_supervisor_index');
     }
 
     #[Route('/supervisor/casework', name: 'app_supervisor_casework_index', methods: ['GET'])]
@@ -196,7 +371,7 @@ class SupervisorController extends AbstractController
             throw $this->createAccessDeniedException('You are not a valid supervisor.');
         }
         
-        // Only fetch cases created by this supervisor that are NOT archived
+        
         $caseworks = $entityManager->getRepository(CaseWork::class)->createQueryBuilder('c')
             ->where('c.createdBy = :supervisor')
             ->andWhere('c.status != :status')
@@ -219,7 +394,7 @@ class SupervisorController extends AbstractController
         /** @var Supervisor $supervisor */
         $supervisor = $this->getUser();
 
-        // Only fetch cases created by this supervisor that ARE archived
+        
         $caseworks = $entityManager->getRepository(CaseWork::class)->findBy(
             ['createdBy' => $supervisor, 'status' => 'archived'],
             ['updatedAt' => 'DESC']
@@ -305,7 +480,7 @@ class SupervisorController extends AbstractController
             $casework->setUpdatedAt(new \DateTimeImmutable());
             $entityManager->flush();
 
-            // Log case status change
+            
             $auditService->logCasestatusChange($supervisor, $casework->gettitle(), $oldstatus, $newstatus);
 
             $this->addFlash('success', sprintf('Case status updated to %s.', $newstatus));

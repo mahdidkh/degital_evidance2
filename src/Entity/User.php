@@ -200,6 +200,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface , TwoFac
     /**
      * @see UserInterface
      */
+    public function isAccountNonLocked(): bool
+    {
+        return $this->isActive === true;
+    }
+
+    /**
+     * @see UserInterface
+     */
     public function eraseCredentials(): void
     {
         // If you store any temporary, sensitive data on the user, clear it here
