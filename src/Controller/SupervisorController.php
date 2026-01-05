@@ -26,9 +26,35 @@ class SupervisorController extends AbstractController
         $supervisor = $this->getUser();
 
         $teams = $entityManager->getRepository(Team::class)->findBy(['supervisor' => $supervisor]);
+        $totalCases = $entityManager->getRepository(CaseWork::class)->count(['createdBy' => $supervisor]);
+        $totalInvestigators = $entityManager->getRepository(Investigateur::class)->count(['supervisor' => $supervisor]);
+
+        // Fetch recent activities for cases created by this supervisor
+        $caseworks = $entityManager->getRepository(CaseWork::class)->findBy(['createdBy' => $supervisor]);
+        $caseIds = array_map(fn($c) => $c->getId(), $caseworks);
+
+        $recentActivities = [];
+        if (!empty($caseIds)) {
+            $recentActivities = $entityManager->getRepository(ChainOfCustody::class)
+                ->createQueryBuilder('c')
+                ->where('c.evidence IN (
+                    SELECT e.id FROM App\Entity\Evidence e WHERE e.caseWork IN (:caseIds)
+                )')
+                ->setParameter('caseIds', $caseIds)
+                ->orderBy('c.date_update', 'DESC')
+                ->setMaxResults(5)
+                ->getQuery()
+                ->getResult();
+        }
 
         return $this->render('supervisor/index.html.twig', [
             'teams' => $teams,
+            'stats' => [
+                'total_teams' => count($teams),
+                'total_cases' => $totalCases,
+                'total_investigators' => $totalInvestigators,
+            ],
+            'recent_activities' => $recentActivities,
         ]);
     }
 

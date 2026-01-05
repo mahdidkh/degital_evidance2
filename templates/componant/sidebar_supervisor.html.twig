@@ -218,6 +218,15 @@
 		<span class="text">Cases</span>
 	</a>
 
+	<a href="{{ path('app_supervisor_team_new') }}" class="menu-item {% if current_route == 'app_supervisor_team_new' %}active{% endif %}">
+		<span class="icon">
+			<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewbox="0 0 24 24" stroke="currentColor">
+				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+			</svg>
+		</span>
+		<span class="text">New Team</span>
+	</a>
+
 	<a href="{{ path('app_supervisor_archive_index') }}" class="menu-item {% if current_route == 'app_supervisor_archive_index' %}active{% endif %}">
 		<span class="icon">
 			<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewbox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
