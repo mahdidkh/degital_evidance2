@@ -330,7 +330,7 @@ document.addEventListener('DOMContentLoaded', function() {
         return;
     }
 
-    // Function to filter teams
+    
     function filterTeams(searchTerm) {
         const term = searchTerm.toLowerCase().trim();
         let visibleCount = 0;
@@ -344,7 +344,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             if (isVisible) {
                 visibleCount++;
-                // Add fade-in animation
+                
                 card.style.opacity = '0';
                 card.style.transform = 'translateY(20px)';
                 

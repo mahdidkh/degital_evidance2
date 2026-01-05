@@ -14,6 +14,8 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
+
 
 
 use App\Entity\CaseWork;
@@ -28,7 +30,7 @@ final class EvidenceController extends AbstractController
     public function new(Request $request, EntityManagerInterface $entityManager, SluggerInterface $slugger, \App\Service\AuditService $auditService): Response
     {
         $evidence = new Evidence();
-        // verifier si un case_id est passé en paramètre pour lier l'evidence au CaseWork
+        
         $caseId = $request->query->get('case_id');
         if ($caseId) {
             $caseWork = $entityManager->getRepository(CaseWork::class)->find($caseId);
@@ -94,7 +96,10 @@ final class EvidenceController extends AbstractController
             $entityManager->flush();
 
             // Log evidence addition to audit system
-            $user = $this->getUser();
+            
+           /** @var \App\Entity\User $user */
+           $user = $this->getUser();
+
             $caseWork = $evidence->getCaseWork();
             $auditService->logGenericEvent(
                 'evidence_added',
@@ -134,22 +139,5 @@ final class EvidenceController extends AbstractController
     }
 
 
-    #[Route('/{id}', name: 'app_evidence_delete', methods: ['POST'])]
-    public function delete(Request $request, Evidence $evidence, EntityManagerInterface $entityManager): Response
-    {
-        if ($this->isCsrfTokenValid('delete'.$evidence->getId(), $request->request->get('_token'))) {
-            $stored = $evidence->getStoredFilename();
-        if ($stored) {
-            $path = $this->getParameter('evidence_directory').'/'.$stored;
-            if (file_exists($path)) {
-                @unlink($path);
-            }
-        }
-
-            $entityManager->remove($evidence);
-            $entityManager->flush();
-        }
-
-        return $this->redirectToRoute('app_evidence_index', [], Response::HTTP_SEE_OTHER);
-    }
+    
 }

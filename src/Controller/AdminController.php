@@ -63,7 +63,7 @@ final class AdminController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->flush();
+            $entityManager->flush(); //execute the update 
 
             // Log profile changes
             $changes = [];

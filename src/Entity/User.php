@@ -10,11 +10,11 @@ use Scheb\TwoFactorBundle\Model\Email\TwoFactorInterface;
 use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: UserRepository::class)]
+#[ORM\Entity(repositoryClass: UserRepository::class)] 
 #[ORM\Table(name: 'user')]
 #[ORM\InheritanceType('SINGLE_TABLE')]
 #[ORM\DiscriminatorColumn(name: 'type', type: 'string')]
-#[ORM\DiscriminatorMap([
+#[ORM\DiscriminatorMap([  //classe parrent et classes filles
     'user' => User::class,
     'investigateur' => Investigateur::class,
     'supervisor' => Supervisor::class,
@@ -28,7 +28,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface , TwoFac
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255 , unique:true)]
     private ?string $cin = null;
 
     #[ORM\Column(length: 255 , unique:true)]
@@ -49,7 +49,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface , TwoFac
     #[ORM\Column(length: 255)]
     private ?string $password = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 8 , unique:true)]
     private ?string $tel = null;
 
     #[ORM\Column]
@@ -188,7 +188,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface , TwoFac
     public function getRoles(): array
     {
         $role = $this->role;
-        // guarantee every user at least has ROLE_USER
+        
         $roles[] = 'ROLE_USER';
         if ($role) {
             $roles[] = $role;

@@ -19,8 +19,9 @@ class InvestigateurController extends AbstractController
     #[Route('/investigateur', name: 'app_investigateur_index')]
     public function index(EntityManagerInterface $entityManager): Response
     {
-        /** @var \App\Entity\User $user */
-        $user = $this->getUser();
+        /** @var \App\Entity\Investigateur $user */
+         $user = $this->getUser();
+
         
         $teams = $user->getTeams();
         $cases = [];
@@ -33,14 +34,14 @@ class InvestigateurController extends AbstractController
             }
         }
         
-        // Sort cases by creation date (newest first)
+        
         usort($cases, function($a, $b) {
             return $b->getCreatedAt() <=> $a->getCreatedAt();
         });
         
         $recentCases = array_slice($cases, 0, 5);
         
-        // Get recent forensic activity for these cases
+       
         $caseIds = array_map(fn($c) => $c->getId(), $cases);
         
         $recentActivities = [];
@@ -71,39 +72,13 @@ class InvestigateurController extends AbstractController
     #[Route('/investigateur/teams', name: 'app_investigateur_teams')]
     public function teams(): Response
     {
-        /** @var \App\Entity\User $user */
-        $user = $this->getUser();
+        /** @var \App\Entity\Investigateur $user */
+         $user = $this->getUser();
+
         
         $teams = $user->getTeams();
         
-        // TEMPORARY: Add test teams if no teams exist
-        if ($teams->isEmpty()) {
-            $mockTeams = [
-                (object)[
-                    'id' => 1,
-                    'name' => 'Crime Investigation Unit',
-                    'supervisor' => (object)['first_name' => 'John', 'last_name' => 'Doe'],
-                    'investigateurs' => [(object)['first_name' => 'Jane', 'last_name' => 'Smith'], (object)['first_name' => 'Bob', 'last_name' => 'Johnson']],
-                    'caseWorks' => [(object)['title' => 'Bank Robbery'], (object)['title' => 'Assault Case']]
-                ],
-                (object)[
-                    'id' => 2,
-                    'name' => 'Cyber Crime Division',
-                    'supervisor' => (object)['first_name' => 'Alice', 'last_name' => 'Brown'],
-                    'investigateurs' => [(object)['first_name' => 'Charlie', 'last_name' => 'Wilson'], (object)['first_name' => 'Diana', 'last_name' => 'Davis']],
-                    'caseWorks' => [(object)['title' => 'Hacking Incident'], (object)['title' => 'Data Breach']]
-                ],
-                (object)[
-                    'id' => 3,
-                    'name' => 'Missing Persons Bureau',
-                    'supervisor' => (object)['first_name' => 'Eve', 'last_name' => 'Miller'],
-                    'investigateurs' => [(object)['first_name' => 'Frank', 'last_name' => 'Garcia'], (object)['first_name' => 'Grace', 'last_name' => 'Lee']],
-                    'caseWorks' => [(object)['title' => 'Missing Teenager'], (object)['title' => 'Elderly Disappearance']]
-                ]
-            ];
-            $teams = $mockTeams;
-        }
-
+        
         return $this->render('investigateur/teams.html.twig', [
             'teams' => $teams,
         ]);
@@ -112,13 +87,11 @@ class InvestigateurController extends AbstractController
     #[Route('/investigateur/team/{id}/members', name: 'app_investigateur_team_members')]
     public function teamMembers(Team $team): Response
     {
-        // Check if the investigator is part of this team
-        /** @var \App\Entity\User $user */
+        
+        /** @var \App\Entity\Investigateur $user */
         $user = $this->getUser();
         
-        if (!$user->getTeams()->contains($team)) {
-            throw $this->createAccessDeniedException('You are not a member of this team.');
-        }
+       
 
         return $this->render('investigateur/team_members.html.twig', [
             'team' => $team,
@@ -128,13 +101,13 @@ class InvestigateurController extends AbstractController
     #[Route('/investigateur/cases', name: 'app_investigateur_cases')]
     public function cases(): Response
     {
-        /** @var \App\Entity\User $user */
+        /** @var \App\Entity\Investigateur $user */
         $user = $this->getUser();
         
-        // Get all teams the investigator belongs to
+       
         $teams = $user->getTeams();
         
-        // Collect all cases from all teams
+       
         $cases = [];
         foreach ($teams as $team) {
             foreach ($team->getCaseWorks() as $casework) {
@@ -142,44 +115,10 @@ class InvestigateurController extends AbstractController
             }
         }
         
-        // TEMPORARY: Add test cases if no cases exist
-        if (empty($cases)) {
-            // Create mock cases for testing search functionality
-            $mockCases = [
-                (object)[
-                    'id' => 1,
-                    'title' => 'Bank Robbery Investigation',
-                    'description' => 'Investigation of the recent bank robbery downtown',
-                    'status' => 'open',
-                    'priority' => 'high',
-                    'createdAt' => new \DateTimeImmutable('2024-01-15'),
-                    'assignedTeam' => (object)['name' => 'Crime Unit']
-                ],
-                (object)[
-                    'id' => 2,
-                    'title' => 'Cyber Fraud Case',
-                    'description' => 'Online banking fraud investigation',
-                    'status' => 'open',
-                    'priority' => 'medium',
-                    'createdAt' => new \DateTimeImmutable('2024-01-10'),
-                    'assignedTeam' => (object)['name' => 'Cyber Unit']
-                ],
-                (object)[
-                    'id' => 3,
-                    'title' => 'Missing Person Report',
-                    'description' => 'Search for missing teenager last seen at mall',
-                    'status' => 'closed',
-                    'priority' => 'critical',
-                    'createdAt' => new \DateTimeImmutable('2024-01-05'),
-                    'assignedTeam' => (object)['name' => 'Missing Persons']
-                ]
-            ];
-            $cases = $mockCases;
-        }
-        
-        // Sort by creation date (newest first)
         usort($cases, function($a, $b) {
-            return $b->createdAt <=> $a->createdAt;
+            $aDate = $a instanceof CaseWork ? $a->getCreatedAt() : $a->createdAt;
+            $bDate = $b instanceof CaseWork ? $b->getCreatedAt() : $b->createdAt;
+            return $bDate <=> $aDate;
         });
 
         return $this->render('investigateur/cases.html.twig', [
@@ -190,10 +129,10 @@ class InvestigateurController extends AbstractController
     #[Route('/investigateur/case/{id}', name: 'app_investigateur_case_show')]
     public function showCase(CaseWork $casework): Response
     {
-        /** @var \App\Entity\User $user */
+        /** @var \App\Entity\Investigateur $user */
         $user = $this->getUser();
         
-        // Check if the case is assigned to one of the investigator's teams
+        
         $assignedTeam = $casework->getAssignedTeam();
         if (!$assignedTeam || !$user->getTeams()->contains($assignedTeam)) {
             throw $this->createAccessDeniedException('You do not have access to this case.');
@@ -207,10 +146,10 @@ class InvestigateurController extends AbstractController
     #[Route('/investigateur/case/{id}/explore', name: 'app_investigateur_case_explore')]
     public function exploreCase(CaseWork $casework): Response
     {
-        /** @var \App\Entity\User $user */
+        /** @var \App\Entity\Investigateur $user */
         $user = $this->getUser();
         
-        // Check if the case is assigned to one of the investigator's teams
+      
         $assignedTeam = $casework->getAssignedTeam();
         if (!$assignedTeam || !$user->getTeams()->contains($assignedTeam)) {
             throw $this->createAccessDeniedException('You do not have access to this case.');
@@ -224,7 +163,7 @@ class InvestigateurController extends AbstractController
     #[Route('/investigateur/evidence/{id}/verify', name: 'app_investigateur_evidence_verify', methods: ['POST'])]
     public function verifyIntegrity(Evidence $evidence, \App\Service\IntegrityService $integrityService): JsonResponse
     {
-        /** @var \App\Entity\User $user */
+        /** @var \App\Entity\Investigateur $user */
         $user = $this->getUser();
         
         $casework = $evidence->getCaseWork();

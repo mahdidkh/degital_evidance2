@@ -14,7 +14,7 @@ class Investigateur extends User
     private ?string $employerId = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $ExpertArea = null;
+    private ?string $ExpertArea = null; 
 
     #[ORM\ManyToMany(targetEntity: CaseWork::class, inversedBy: 'investigateurs')]
     private Collection $caseWorks;
@@ -107,7 +107,7 @@ class Investigateur extends User
     public function removeTeam(Team $team): static
     {
         if ($this->teams->removeElement($team)) {
-            $team->removeInvestigateur($this);
+            $team->removeInvestigateur($this); 
         }
 
         return $this;

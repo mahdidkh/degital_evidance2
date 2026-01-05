@@ -74,7 +74,7 @@ class Supervisor extends User
     public function removeInvestigateur(Investigateur $investigateur): static
     {
         if ($this->investigateurs->removeElement($investigateur)) {
-            // set the owning side to null (unless already changed)
+           
             if ($investigateur->getSupervisor() === $this) {
                 $investigateur->setSupervisor(null);
             }
@@ -107,7 +107,7 @@ class Supervisor extends User
     public function removeTeam(Team $team): static
     {
         if ($this->teams->removeElement($team)) {
-            // set the owning side to null (unless already changed)
+            
             if ($team->getSupervisor() === $this) {
                 $team->setSupervisor(null);
             }

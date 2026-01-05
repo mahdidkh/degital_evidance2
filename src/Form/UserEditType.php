@@ -5,6 +5,7 @@ namespace App\Form;
 use App\Entity\User;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -40,12 +41,23 @@ class UserEditType extends AbstractType
                 'label' => 'CIN / ID Number',
                 'constraints' => [new NotBlank()],
             ])
+            ->add('role', ChoiceType::class, [
+                'label' => 'Role',
+                'choices' => [
+                    'Investigateur' => 'ROLE_INVESTIGATEUR',
+                    'Supervisor' => 'ROLE_SUPERVISOR',
+                    'Administrateur' => 'ROLE_ADMINISTRATEUR',
+                ],
+                'constraints' => [new NotBlank()],
+            ])
+        
             ->add('isActive', CheckboxType::class, [
                 'label' => 'Account Active',
                 'required' => false,
                 'label_attr' => ['class' => 'checkbox-custom-label'],
             ])
         ;
+            
     }
 
     public function configureOptions(OptionsResolver $resolver): void

@@ -23,11 +23,11 @@ class Evidence
     #[ORM\Column(length: 255)]
     private ?string $fileHash = null;
 
-   // nouveau : nom du fichier stocké sur le serveur
+   
     #[ORM\Column(type:"string", length:255, nullable:true)]
     private ?string $storedFilename = null;
 
-    // nouveau : remarque
+   
     #[ORM\Column(type:"text", nullable:true)]
     private ?string $remarque = null;
 

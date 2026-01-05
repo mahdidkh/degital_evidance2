@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20260103103424 extends AbstractMigration
+final class Version20260104104619 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -20,12 +20,16 @@ final class Version20260103103424 extends AbstractMigration
     public function up(Schema $schema): void
     {
         // this up() migration is auto-generated, please modify it to your needs
-        $this->addSql('ALTER TABLE evidence ADD created_at DATETIME DEFAULT NULL COMMENT \'(DC2Type:datetime_immutable)\'');
+        $this->addSql('ALTER TABLE user CHANGE tel tel VARCHAR(8) NOT NULL');
+        $this->addSql('CREATE UNIQUE INDEX UNIQ_8D93D649ABE530DA ON user (cin)');
+        $this->addSql('CREATE UNIQUE INDEX UNIQ_8D93D649F037AB0F ON user (tel)');
     }
 
     public function down(Schema $schema): void
     {
         // this down() migration is auto-generated, please modify it to your needs
-        $this->addSql('ALTER TABLE evidence DROP created_at');
+        $this->addSql('DROP INDEX UNIQ_8D93D649ABE530DA ON user');
+        $this->addSql('DROP INDEX UNIQ_8D93D649F037AB0F ON user');
+        $this->addSql('ALTER TABLE user CHANGE tel tel VARCHAR(255) NOT NULL');
     }
 }

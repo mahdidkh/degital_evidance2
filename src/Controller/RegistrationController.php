@@ -34,14 +34,14 @@ class RegistrationController extends AbstractController
             /** @var string $plainPassword */
             $plainPassword = $form->get('plainPassword')->getData();
 
-            // encode the plain password
+          
             $user->setPassword($userPasswordHasher->hashPassword($user, $plainPassword));
             $user->setIsActive(true);
 
             $entityManager->persist($user);
             $entityManager->flush();
 
-            // generate a signed url and email it to the user
+          
             $this->emailVerifier->sendEmailConfirmation('app_verify_email', $user,
                 (new TemplatedEmail())
                     ->from(new Address('DigitalEvidence@RedTeam.us', 'Digital Evidence'))
@@ -50,7 +50,7 @@ class RegistrationController extends AbstractController
                     ->htmlTemplate('registration/confirmation_email.html.twig')
             );
 
-            // Redirect to login with a message to check email
+            
             $this->addFlash('success', 'Registration successful! Please check your email to verify your account.');
             
             return $this->redirectToRoute('app_login');
@@ -67,7 +67,7 @@ class RegistrationController extends AbstractController
         try {
             $this->emailVerifier->handleEmailConfirmationFromUrl($request);
             
-            // Redirect to login after successful email verification
+           
             $this->addFlash('success', 'Your email address has been verified. You can now log in.');
             return $this->redirectToRoute('app_login');
             

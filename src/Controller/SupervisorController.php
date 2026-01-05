@@ -24,10 +24,6 @@ class SupervisorController extends AbstractController
     {
         /** @var Supervisor $supervisor */
         $supervisor = $this->getUser();
-        
-        if (!$supervisor instanceof Supervisor) {
-            throw $this->createAccessDeniedException('You are not a valid supervisor.');
-        }
 
         $teams = $entityManager->getRepository(Team::class)->findBy(['supervisor' => $supervisor]);
 
@@ -42,10 +38,6 @@ class SupervisorController extends AbstractController
         /** @var Supervisor $supervisor */
         $supervisor = $this->getUser();
 
-        if (!$supervisor instanceof Supervisor) {
-            throw $this->createAccessDeniedException('You are not a valid supervisor.');
-        }
-
         if ($request->isMethod('POST')) {
             $teamName = $request->request->get('name');
             if (!$teamName) {
@@ -56,7 +48,7 @@ class SupervisorController extends AbstractController
             $team = new Team();
             $team->setName($teamName);
             $team->setSupervisor($supervisor);
-
+           
             $entityManager->persist($team);
             $entityManager->flush();
 
@@ -83,11 +75,8 @@ class SupervisorController extends AbstractController
         /** @var Supervisor $supervisor */
         $supervisor = $this->getUser();
 
-        if ($team->getSupervisor() !== $supervisor) {
-            throw $this->createAccessDeniedException('You are not authorized to manage this team.');
-        }
-
-        // Get investigators assigned to this supervisor OR those with no supervisor
+        
+        // Get available investigators (not already in the team) under this supervisor or unassigned
         $availableInvestigators = $entityManager->getRepository(Investigateur::class)->createQueryBuilder('i')
             ->where('i.supervisor = :supervisor')
             ->orWhere('i.supervisor IS NULL')
@@ -112,9 +101,6 @@ class SupervisorController extends AbstractController
         /** @var Supervisor $supervisor */
         $supervisor = $this->getUser();
 
-        if ($team->getSupervisor() !== $supervisor) {
-            throw $this->createAccessDeniedException('You are not authorized to manage this team.');
-        }
 
         $investigatorId = $request->request->get('investigatorId');
         $investigator = $entityManager->getRepository(Investigateur::class)->find($investigatorId);
@@ -124,13 +110,13 @@ class SupervisorController extends AbstractController
             return $this->redirectToRoute('app_supervisor_team_manage', ['id' => $team->getId()]);
         }
 
-        // Check if investigator is already assigned to ANOTHER supervisor
+        
         if ($investigator->getSupervisor() !== null && $investigator->getSupervisor() !== $supervisor) {
             $this->addFlash('error', 'This investigator is managed by another supervisor.');
             return $this->redirectToRoute('app_supervisor_team_manage', ['id' => $team->getId()]);
         }
 
-        // Assign to supervisor if unassigned
+    
         if ($investigator->getSupervisor() === null) {
             $investigator->setSupervisor($supervisor);
         }
@@ -138,7 +124,7 @@ class SupervisorController extends AbstractController
         $investigator->addTeam($team);
         $entityManager->flush();
 
-        // Log team membership change
+       
         $auditService->logTeamMembershipChange($supervisor, $investigator, $team->getName(), 'added');
 
         $this->addFlash('success', sprintf('%s added to team %s.', $investigator->getEmail(), $team->getName()));
@@ -194,39 +180,7 @@ class SupervisorController extends AbstractController
             ->getQuery()
             ->getResult();
 
-        // TEMPORARY: Add test cases if no cases exist
-        if (empty($caseworks)) {
-            $mockCases = [
-                (object)[
-                    'id' => 1,
-                    'title' => 'Corporate Espionage Investigation',
-                    'description' => 'Investigation into industrial secrets theft at TechCorp',
-                    'status' => 'open',
-                    'priority' => 'critical',
-                    'createdAt' => new \DateTimeImmutable('2024-01-20'),
-                    'assignedTeam' => (object)['name' => 'Special Investigations']
-                ],
-                (object)[
-                    'id' => 2,
-                    'title' => 'Financial Fraud Scheme',
-                    'description' => 'Complex Ponzi scheme affecting multiple investors',
-                    'status' => 'in_progress',
-                    'priority' => 'high',
-                    'createdAt' => new \DateTimeImmutable('2024-01-18'),
-                    'assignedTeam' => (object)['name' => 'Financial Crimes Unit']
-                ],
-                (object)[
-                    'id' => 3,
-                    'title' => 'Drug Trafficking Network',
-                    'description' => 'Major drug distribution ring operating across state lines',
-                    'status' => 'open',
-                    'priority' => 'critical',
-                    'createdAt' => new \DateTimeImmutable('2024-01-15'),
-                    'assignedTeam' => (object)['name' => 'Drug Enforcement']
-                ]
-            ];
-            $caseworks = $mockCases;
-        }
+       
 
         return $this->render('supervisor/casework/index.html.twig', [
             'caseworks' => $caseworks,
@@ -238,39 +192,12 @@ class SupervisorController extends AbstractController
     {
         /** @var Supervisor $supervisor */
         $supervisor = $this->getUser();
-        
-        if (!$supervisor instanceof Supervisor) {
-            throw $this->createAccessDeniedException('You are not a valid supervisor.');
-        }
 
         // Only fetch cases created by this supervisor that ARE archived
         $caseworks = $entityManager->getRepository(CaseWork::class)->findBy(
             ['createdBy' => $supervisor, 'status' => 'archived'],
             ['updatedAt' => 'DESC']
         );
-
-        // TEMPORARY: Add test cases if no cases exist
-        if (empty($caseworks)) {
-            $mockCases = [
-                (object)[
-                    'id' => 1,
-                    'title' => 'Stolen Phone Investigation',
-                    'description' => 'Investigation of stolen mobile device recovered with evidence',
-                    'status' => 'archived',
-                    'updatedAt' => new \DateTimeImmutable('2024-01-10'),
-                    'assignedTeam' => (object)['name' => 'Digital Forensics']
-                ],
-                (object)[
-                    'id' => 2,
-                    'title' => 'Cold Case Homicide',
-                    'description' => 'Archived cold case reopened and solved using new DNA evidence',
-                    'status' => 'archived',
-                    'updatedAt' => new \DateTimeImmutable('2024-01-08'),
-                    'assignedTeam' => (object)['name' => 'Homicide Division']
-                ]
-            ];
-            $caseworks = $mockCases;
-        }
 
         return $this->render('supervisor/casework/archive.html.twig', [
             'caseworks' => $caseworks,
@@ -283,10 +210,6 @@ class SupervisorController extends AbstractController
         /** @var Supervisor $supervisor */
         $supervisor = $this->getUser();
         
-        if (!$supervisor instanceof Supervisor) {
-            throw $this->createAccessDeniedException('You are not a valid supervisor.');
-        }
-
         $teams = $entityManager->getRepository(Team::class)->findBy(['supervisor' => $supervisor]);
 
         if ($request->isMethod('POST')) {
@@ -333,9 +256,7 @@ class SupervisorController extends AbstractController
         /** @var Supervisor $supervisor */
         $supervisor = $this->getUser();
         
-        if ($casework->getCreatedBy() !== $supervisor) {
-            throw $this->createAccessDeniedException('You are not authorized to view this case.');
-        }
+    
 
         return $this->render('supervisor/casework/show.html.twig', [
             'casework' => $casework,
@@ -348,9 +269,6 @@ class SupervisorController extends AbstractController
         /** @var Supervisor $supervisor */
         $supervisor = $this->getUser();
 
-        if ($casework->getCreatedBy() !== $supervisor) {
-            throw $this->createAccessDeniedException('You are not authorized to change the status of this case.');
-        }
 
         $oldstatus = $casework->getstatus();
         $newstatus = $request->request->get('status');
@@ -378,10 +296,7 @@ class SupervisorController extends AbstractController
         /** @var Supervisor $supervisor */
         $supervisor = $this->getUser();
         
-        if ($casework->getCreatedBy() !== $supervisor) {
-            throw $this->createAccessDeniedException('You are not authorized to view this case.');
-        }
-
+       
         return $this->render('supervisor/casework/explore.html.twig', [
             'casework' => $casework,
         ]);

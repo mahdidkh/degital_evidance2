@@ -149,7 +149,7 @@
 		color: var(--text-light);
 	}
 
-	/* File input custom styling */
+	
 	input[type="file"]::file-selector-button {
 		background: rgba(255, 255, 255, 0.1);
 		border: none;
@@ -168,20 +168,24 @@
 <div class="evidence-page">
 	<div class="form-wrapper">
 		<header class="page-header">
-			<h1>Nouvelle Evidence</h1>
+			<h1>New Evidence</h1>
 			{% if evidence.caseWork %}
 				<div class="case-context">
 					<span class="material-symbols-outlined">folder</span>
-					Dossier:
+					Folder case:
 					{{ evidence.caseWork.title }}
 				</div>
 			{% endif %}
 		</header>
 
-		{{ include('evidence/_form.html.twig', {'button_label': 'Ajouter Evidence'}) }}
+		{{ include('evidence/_form.html.twig', {'button_label': 'Add Evidence'}) }}
 
 		<a class="btn-back" href="{{ path('app_investigateur_case_explore', {id: evidence.caseWork.id}) }}">
-			Retour à la liste des cases
-		</a>
+			<span class="material-symbols-outlined">arrow_back</span>
+				Back to the case list 
+			</a>
+
+			
+		
 	</footer>
 </div></div>{% endblock %}

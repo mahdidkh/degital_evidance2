@@ -25,7 +25,7 @@ class EmailVerifier
             $verifyEmailRouteName,
             (string) $user->getId(),
             (string) $user->getEmail(),
-            ['id' => $user->getId()] // Add user ID as route parameter
+            ['id' => $user->getId()] // Route parameters
         );
 
         $context = $email->getContext();
@@ -57,22 +57,21 @@ class EmailVerifier
      */
     public function handleEmailConfirmationFromUrl(Request $request): void
     {
-        // Extract user ID from the route parameter
-        // The VerifyEmailHelper adds this to the URL via route parameters
+        
         $userId = $request->attributes->get('id');
         
         if (!$userId) {
             throw new \InvalidArgumentException('Missing user ID in verification link');
         }
 
-        // Fetch user from database
+        
         $user = $this->entityManager->getRepository(User::class)->find($userId);
         
         if (!$user) {
             throw new \InvalidArgumentException('User not found');
         }
 
-        // Validate the signed URL and mark user as verified
+      
         $this->handleEmailConfirmation($request, $user);
     }
 }
